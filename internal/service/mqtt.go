@@ -4,8 +4,65 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"time"
 	"ttu-backend/internal/model"
 )
+
+// 订阅回调
+// 可以传一个全局变量进去修改
+// 多设计几个全局变量
+
+var realtimeResTmp string
+
+//var realtimeResHum []byte
+//var TopoRes []byte
+
+func subCallBackFunc(client MQTT.Client, msg MQTT.Message) {
+	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
+	// 这一步是将消息进行解析并return
+
+	realtimeResTmp = string(msg.Payload())
+
+}
+
+// 连接MQTT服务
+func connMQTT(broker string) (bool, MQTT.Client) {
+	opts := MQTT.NewClientOptions()
+	opts.AddBroker(broker)
+
+	mc := MQTT.NewClient(opts)
+	if token := mc.Connect(); token.Wait() && token.Error() != nil {
+		return false, mc
+	}
+
+	return true, mc
+}
+
+// 订阅某一个主题
+func subscribe(topic string) {
+	// sub的用户名和密码
+	b, mc := connMQTT("sinpower.3322.org:11883")
+	// sinpower.3322.org:11883
+	// mnifdv.cn:1883
+	if !b {
+		fmt.Println("sub connMQTT failed")
+		return
+	}
+	mc.Subscribe(topic, 0x00, subCallBackFunc)
+	fmt.Println(topic)
+}
+
+// 发布消息
+func publish(topic string, str string) {
+	b, mc := connMQTT("sinpower.3322.org:11883")
+	if !b {
+		fmt.Println("pub connMQTT failed")
+		return
+	}
+	// 发送
+	mc.Publish(topic, 0x00, true, str)
+}
 
 type (
 	// sMqtt is service struct of module Mqtt.
@@ -28,9 +85,81 @@ func (s *sMqtt) MqttDatabaseGetHistory(ctx context.Context, in model.MqttDatabas
 		return out, err
 	}
 	fmt.Println(string(reqJson))
+
 	//todo:此处请求数据中心“6.13.1按时间查询”接口,替换下面的模拟函数
+	/* 参数类型
+	"dev": "string",
+	 "end_time": "2006-01-02 15:04:05",
+	 "frozen_type": "string",
+	 "start_time": "2006-01-02 14:04:05",
+	 "time_span": "string",
+	 "time_type": "string"
+	*/
+
 	out = Simulator()
 	return out, nil
+}
+
+func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, topic string, in string) (out model.MqttDatabaseGetRealtimeOut, err error) {
+	if err != nil {
+		return out, err
+	}
+	// 订阅某主题
+	subscribe("database/get/response/TestApp/realtime")
+	// 发布消息
+	fmt.Println("发布的消息 " + topic)
+	publish(topic, in)
+	fmt.Println(realtimeResTmp)
+	// 对消息体进行解析
+	time.Sleep(time.Second)
+	return RealtimeSimulator(realtimeResTmp), nil
+}
+
+func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string) (out model.MqttDatabaseGetTopoOut, err error) {
+	if err != nil {
+		return out, err
+	}
+	// 订阅某主题
+	subscribe("database/get/response/TestApp/register")
+	// 发布消息
+	fmt.Println("发布的消息 " + topic)
+	publish(topic, in)
+	fmt.Println(realtimeResTmp)
+	// 对消息体进行解析
+	time.Sleep(time.Second)
+	return TopoSimulator(realtimeResTmp), nil
+
+}
+
+func TopoSimulator(cont string) (res model.MqttDatabaseGetTopoOut) {
+	var model1 model.MqttDatabaseGetTopoOut
+	fmt.Println(json.Unmarshal([]byte(cont), &model1))
+	fmt.Println(model1)
+	return model1
+}
+
+func RealtimeSimulator(cont string) (res model.MqttDatabaseGetRealtimeOut) {
+	var model1 model.MqttDatabaseGetRealtimeOut
+	fmt.Println(json.Unmarshal([]byte(cont), &model1))
+	fmt.Println(model1)
+	return model1
+	/*return model.MqttDatabaseGetRealtimeOut{
+		Token:     model1.Token,
+		Timestamp: model1.Timestamp,
+		Body: []model.MqttDatabaseGetRealtimeOutBody{
+			{
+				Dev: model1.Body[0].Dev,
+				Body: []model.MqttDatabaseGetRealtimeOutBodyBody{
+					{
+						Name:      model1.Body[0].Body[0].Name,
+						Val:       model1.Body[0].Body[0].Val,
+						Quality:   model1.Body[0].Body[0].Quality,
+						Timestamp: model1.Body[0].Body[0].Timestamp,
+					},
+				},
+			},
+		},
+	}*/
 }
 
 func Simulator() (res model.MqttDatabaseGetHistoryOut) {

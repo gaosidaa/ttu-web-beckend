@@ -29,3 +29,49 @@ type DataHistoryResBodyBody struct {
 	Name string `json:"name"                title:"变量名"`
 	Val  string `json:"val"                 title:"变量值"`
 }
+
+// 实时数据
+
+type DataRealtimeReq struct {
+	g.Meta    `path:"/data/realtime" method:"post" tags:"Data" summary:"获取某一设备的某一属性实时数据"`
+	Dev       string `json:"dev"         v:"required" title:"设备的唯一地址" dc:"由模型和guid组合而成，是数据中心中设备的唯一地址"`
+	Attribute string `json:"attribute" v:"required" title:"设备的属性" dc:"想要获取的某一项设备属性"`
+}
+
+type DataRealtimeRes struct {
+	Dev  string                `json:"dev"         title:"设备的唯一地址"`
+	Body []DataRealtimeResBody `json:"body"                title:"数据体"`
+}
+
+type DataRealtimeResBody struct {
+	Name      string      `json:"name"                title:"变量名"`
+	Val       string      `json:"val"                 title:"变量值"`
+	Quality   string      `json:"quality"             title:"质量"`
+	Timestamp *gtime.Time `json:"time"                title:"数据时间"`
+}
+
+// 台区拓扑数据
+
+type DataTopoReq struct {
+	g.Meta `path:"/data/register" method:"get" tags:"Data" summary:"获取某一台区的所有设备列表"`
+}
+
+type DataTopoRes struct {
+	Body []DataTopoResBody `json:"body"                title:"数据体"`
+}
+
+type DataTopoResBody struct {
+	Model string                `json:"model" title:"模型名称"`
+	Port  string                `json:"port" title:"端口号"`
+	Body  []DataTopoResBodyBody `json:"body" title:"该模型的所有设备"`
+}
+
+type DataTopoResBodyBody struct {
+	Guid     string `json:"guid"`
+	Dev      string `json:"dev"`
+	Addr     string `json:"addr"`
+	Appname  string `json:"appname"`
+	Desc     string `json:"desc"`
+	ManuID   string `json:"manuID"`
+	Isreport string `json:"isreport"`
+}
