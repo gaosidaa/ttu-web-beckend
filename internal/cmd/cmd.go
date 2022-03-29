@@ -25,7 +25,10 @@ var (
 				)
 			})
 			enhanceOpenAPIDoc(s)
-			g.SetDebug(true)
+			//g.SetDebug(true)
+			s.SetIndexFolder(true)
+			s.AddStaticPath("/", "/dist")
+			s.AddSearchPath("/dist")
 			s.Run()
 			return nil
 		},
