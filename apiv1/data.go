@@ -5,6 +5,13 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 )
 
+type DataInitReq struct {
+	g.Meta `path:"/data/init" method:"post" tags:"Data" summary:"初始数据加载"`
+}
+
+type DataRes struct {
+}
+
 type DataHistoryReq struct {
 	g.Meta     `path:"/data/history" method:"post" tags:"Data" summary:"获取历史数据"`
 	Dev        string `json:"dev"         v:"required" title:"设备的唯一地址" dc:"由模型和guid组合而成，是数据中心中设备的唯一地址"`

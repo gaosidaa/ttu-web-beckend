@@ -1,15 +1,47 @@
 package model
 
-// 历史数据
+// EmptyIn 空消息体
+type EmptyIn struct {
+	Token     string `json:"token"`
+	Timestamp string `json:"timestamp"`
+	Body      string `json:"body"`
+}
 
+// MqttInitOut 挂接设备列表消息体
+type MqttInitOut struct {
+	Token     string          `json:"token"`
+	Timestamp string          `json:"timestamp"`
+	Body      MqttInitOutBody `json:"body"`
+}
+
+// MqttInitOutBody App所有注册设备
+type MqttInitOutBody struct {
+	App  string              `json:"appname"`
+	Body MqttInitOutBodyBody `json:"body"`
+}
+
+// MqttInitOutBodyBody 每个设备的具体信息
+type MqttInitOutBodyBody struct {
+	Dev     string `json:"dev"`
+	Model   string `json:"model"`
+	Port    string `json:"port"`
+	Address string `json:"addr"`
+	Desc    string `json:"desc"`
+}
+
+// MqttDatabaseGetHistoryIn 历史数据
 type MqttDatabaseGetHistoryIn struct {
-	Token      string                       `json:"token"`
-	TimeType   string                       `json:"time_type"`
-	StartTime  string                       `json:"start_time"`
-	EndTime    string                       `json:"end_time"`
-	TimeSpan   string                       `json:"time_span"`
-	FrozenType string                       `json:"frozentype"`
-	Body       MqttDatabaseGetHistoryInBody `json:"body"`
+	Token      string   `json:"token"`
+	TimeType   string   `json:"time_type"`
+	StartTime  string   `json:"start_time"`
+	EndTime    string   `json:"end_time"`
+	Timestamp  string   `json:"timestamp"`
+	Dev        string   `json:"dev"`
+	UpperN     string   `json:"upperN"`
+	TimeSpan   string   `json:"time_span"`
+	FrozenType string   `json:"frozentype"`
+	Body       []string `json:"body"`
+	//Body       MqttDatabaseGetHistoryInBody `json:"body"`
 }
 type MqttDatabaseGetHistoryInBody struct {
 	Dev  string   `json:"dev"`

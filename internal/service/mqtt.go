@@ -4,65 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"time"
+	"ttu-backend/internal/consts"
 	"ttu-backend/internal/model"
+	"ttu-backend/internal/model/entity"
 )
 
-// 订阅回调
-// 可以传一个全局变量进去修改
-// 多设计几个全局变量
+// 全局设备数组与全局模型数组
+var DeviceList entity.Devices
+var ModelList entity.Models
+var FrozenModelList entity.Models
 
+// 消息全局变量
+var initResTmp string
 var realtimeResTmp string
+var historyRestmp model.MqttDatabaseGetHistoryOut
 
 //var realtimeResHum []byte
 //var TopoRes []byte
-
-func subCallBackFunc(client MQTT.Client, msg MQTT.Message) {
-	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-
-	realtimeResTmp = string(msg.Payload())
-
-}
-
-// 连接MQTT服务
-func connMQTT(broker string) (bool, MQTT.Client) {
-	opts := MQTT.NewClientOptions()
-	opts.AddBroker(broker)
-
-	mc := MQTT.NewClient(opts)
-	if token := mc.Connect(); token.Wait() && token.Error() != nil {
-		return false, mc
-	}
-
-	return true, mc
-}
-
-// 订阅某一个主题
-func subscribe(topic string) {
-	// sub的用户名和密码
-	b, mc := connMQTT("sinpower.3322.org:11883")
-	// sinpower.3322.org:11883
-	// mnifdv.cn:1883
-	if !b {
-		fmt.Println("sub connMQTT failed")
-		return
-	}
-	mc.Subscribe(topic, 0x00, subCallBackFunc)
-	fmt.Println(topic)
-}
-
-// 发布消息
-func publish(topic string, str string) {
-	b, mc := connMQTT("sinpower.3322.org:11883")
-	if !b {
-		fmt.Println("pub connMQTT failed")
-		return
-	}
-	// 发送
-	mc.Publish(topic, 0x00, true, str)
-}
 
 type (
 	// sMqtt is service struct of module Mqtt.
@@ -79,24 +38,27 @@ func Mqtt() *sMqtt {
 	return &insMqtt
 }
 
+func (s *sMqtt) MqttInit(ctx context.Context, in model.EmptyIn) (out model.MqttInitOut, err error) {
+	reqJson, err := json.Marshal(in)
+	if err != nil {
+		return out, err
+	}
+	publish(consts.Publish_device_get, string(reqJson))
+	err = json.Unmarshal([]byte(initResTmp), &out)
+	if err != nil {
+		return model.MqttInitOut{}, err
+	}
+	return out, err
+}
+
 func (s *sMqtt) MqttDatabaseGetHistory(ctx context.Context, in model.MqttDatabaseGetHistoryIn) (out model.MqttDatabaseGetHistoryOut, err error) {
 	reqJson, err := json.Marshal(in)
 	if err != nil {
 		return out, err
 	}
 	fmt.Println(string(reqJson))
-
-	//todo:此处请求数据中心“6.13.1按时间查询”接口,替换下面的模拟函数
-	/* 参数类型
-	"dev": "string",
-	 "end_time": "2006-01-02 15:04:05",
-	 "frozen_type": "string",
-	 "start_time": "2006-01-02 14:04:05",
-	 "time_span": "string",
-	 "time_type": "string"
-	*/
-
-	out = Simulator()
+	publish(consts.Publish_history_data_get, string(reqJson))
+	out = historyRestmp
 	return out, nil
 }
 
@@ -104,8 +66,6 @@ func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, topic string, in st
 	if err != nil {
 		return out, err
 	}
-	// 订阅某主题
-	subscribe("database/get/response/TestApp/realtime")
 	// 发布消息
 	fmt.Println("发布的消息 " + topic)
 	publish(topic, in)
@@ -119,8 +79,6 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string
 	if err != nil {
 		return out, err
 	}
-	// 订阅某主题
-	subscribe("database/get/response/TestApp/register")
 	// 发布消息
 	fmt.Println("发布的消息 " + topic)
 	publish(topic, in)

@@ -6,14 +6,24 @@ const (
 	//OpenAPITagNameChat = `Chat`
 	OpenAPITagNameUser = `User`
 
+	MQTTBroker = "mqtt://sinpower.3322.org:11883"
+	MQTTQos    = 0x2
+
+	Publish_device_get        = "TestApp/get/request/database/vT"
+	Publish_modelschema_get   = "TestApp/get/request/database/modelschema"
+	Publish_model_get         = "TestApp/get/request/database/model"
+	Publish_guid_get          = "TestApp/get/request/database/guid"
 	Publish_register_get      = "TestApp/get/request/database/register"
 	Publish_realtime_data_get = "TestApp/get/request/database/realtime"
 	Publish_history_data_get  = "TestApp/get/request/database/history"
 	Publish_get_MonMax        = "TestApp/set/request/database/DataStoreDepth"
 	Publish_initData          = "TestApp/action/request/database/InitData"
 
-	Peceived_initData = "database/action/response/TestApp/InitData"
-
+	Received_device_get        = "database/get/response/TestApp/vT"
+	Received_modelschema_get   = "database/get/response/TestApp/modelschema"
+	Received_model_get         = "database/get/response/TestApp/model"
+	Received_guid_get          = "database/get/response/TestApp/guid"
+	Received_initData          = "database/action/response/TestApp/InitData"
 	Received_register_get      = "database/get/response/TestApp/register"
 	Received_realtime_data_get = "database/get/response/TestApp/realtime"
 	Received_history_data_get  = "database/get/response/TestApp/history"

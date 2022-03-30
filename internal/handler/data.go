@@ -15,23 +15,42 @@ var (
 
 type hData struct{}
 
+// DataInit 加载初始数据，设备列表和对应模型
+func (h *hData) DataInit(ctx context.Context, req *apiv1.DataInitReq) (res *apiv1.DataRes, err error) {
+	res = &apiv1.DataRes{}
+	in := model.EmptyIn{
+		Token:     "123",
+		Timestamp: "2019-12-25T00:00:00.727+0800",
+		Body:      "",
+	}
+_:
+	out, err := service.Mqtt().MqttInit(ctx, in)
+	gconv.Struct(out, &res)
+	return res, nil
+}
+
+// DataHistory 按上N条访问历史数据
 func (h *hData) DataHistory(ctx context.Context, req *apiv1.DataHistoryReq) (res *apiv1.DataHistoryRes, err error) {
 	res = &apiv1.DataHistoryRes{}
 	in := model.MqttDatabaseGetHistoryIn{
-		Token:      "633",
-		TimeType:   "timestartgather",
-		StartTime:  "2019-12-25T00:00:00.727+0800",
-		EndTime:    "2019-12-25T23:42:30.727+0800",
-		TimeSpan:   "5",
+		Token: "633",
+		//TimeType:   "timestartgather",
+		//StartTime:  "2022-03-29T23:05:50.296+0800",
+		//EndTime:    "2022-03-29T23:16:50.296+0800",
+		//TimeSpan:   "5",
+		Timestamp:  "2022-03-29T23:32:49.223+0800",
+		Dev:        "LTU_frozen_3b2ebaac2c6bc90a",
+		UpperN:     "10",
 		FrozenType: "min",
-		Body: model.MqttDatabaseGetHistoryInBody{
-			Dev:  "ADC_frozen_fa0ad9d877ba7f41",
-			Body: []string{},
-		},
+		Body:       []string{"PhV_phsA"},
+		//Body: model.MqttDatabaseGetHistoryInBody{
+		//	Dev:  "LTU_frozen_3b2ebaac2c6bc90a",
+		//	Body: []string{"PhV_phsA"},
+		//},
 	}
 _:
 	gconv.Struct(req, &in)
-	in.Body.Dev = req.Dev
+	//in.Body.Dev = req.Dev
 	out, err := service.Mqtt().MqttDatabaseGetHistory(ctx, in)
 	if err != nil {
 		return nil, err
