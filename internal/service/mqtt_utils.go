@@ -20,35 +20,32 @@ func schemaCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
 
-	realtimeResTmp = string(msg.Payload())
+	//realtimeResTmp = string(msg.Payload())
 }
 
 func modelCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
 
-	realtimeResTmp = string(msg.Payload())
+	//realtimeResTmp = string(msg.Payload())
 }
 
 func guidCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
-
-	realtimeResTmp = string(msg.Payload())
+	realtimeChan <- string(msg.Payload())
 }
 
 func registerCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
-
-	topoRes = string(msg.Payload())
+	topoChan <- string(msg.Payload())
 }
 
 func realtimeCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
-
-	realtimeResTmp = string(msg.Payload())
+	realtimeChan <- string(msg.Payload())
 }
 
 func hisCallBackFunc(client MQTT.Client, msg MQTT.Message) {
@@ -59,6 +56,7 @@ func hisCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	historyChan <- historyRestmp
 }
 
 func initCallBackFunc(client MQTT.Client, msg MQTT.Message) {
@@ -92,7 +90,7 @@ func connMQTT(broker string) (bool, MQTT.Client) {
 
 // 发布消息
 func publish(topic string, str string) {
-	b, mc := connMQTT(consts.MQTTBroker)
+	b, mc := connMQTT(consts.MQTTLAN)
 	if !b {
 		fmt.Println("pub connMQTT failed")
 		return

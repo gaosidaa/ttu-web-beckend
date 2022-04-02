@@ -7,6 +7,7 @@ const (
 	OpenAPITagNameUser = `User`
 
 	MQTTBroker = "mqtt://sinpower.3322.org:11883"
+	MQTTLAN    = "mqtt://192.168.2.33:1883"
 	MQTTQos    = 0x2
 
 	Publish_device_get        = "TestApp/get/request/database/vT"

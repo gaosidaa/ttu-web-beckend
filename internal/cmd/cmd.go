@@ -19,6 +19,7 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
+				group.Middleware(MiddlewareCORS)
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					handler.Data,
@@ -55,4 +56,9 @@ func enhanceOpenAPIDoc(s *ghttp.Server) {
 		{Name: consts.OpenAPITagNameUser},
 		//{Name: consts.OpenAPITagNameChat},
 	}
+}
+
+func MiddlewareCORS(r *ghttp.Request) {
+	r.Response.CORSDefault()
+	r.Middleware.Next()
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 	"ttu-backend/internal/consts"
 	"ttu-backend/internal/model"
 	"ttu-backend/internal/model/entity"
@@ -20,6 +19,11 @@ var initResTmp string
 var realtimeResTmp string
 var topoRes string
 var historyRestmp model.MqttDatabaseGetHistoryOut
+var (
+	historyChan  = make(chan model.MqttDatabaseGetHistoryOut)
+	realtimeChan = make(chan string)
+	topoChan     = make(chan string)
+)
 
 //var realtimeResHum []byte
 //var TopoRes []byte
@@ -59,7 +63,7 @@ func (s *sMqtt) MqttDatabaseGetHistory(ctx context.Context, in model.MqttDatabas
 	}
 	fmt.Println(string(reqJson))
 	publish(consts.Publish_history_data_get, string(reqJson))
-	out = historyRestmp
+	out = <-historyChan
 	return out, nil
 }
 
@@ -72,8 +76,7 @@ func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, topic string, in st
 	publish(topic, in)
 	fmt.Println(realtimeResTmp)
 	// 对消息体进行解析
-	time.Sleep(time.Second)
-	return RealtimeSimulator(realtimeResTmp), nil
+	return RealtimeSimulator(<-realtimeChan), nil
 }
 
 func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string, modelName []string) (out model.MqttDatabaseGetTopoOut, err error) {
@@ -85,8 +88,7 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string
 	publish(topic, in)
 	fmt.Println(topoRes)
 	// 对消息体进行解析
-	time.Sleep(time.Second)
-	return TopoSimulator(topoRes, modelName), nil
+	return TopoSimulator(<-topoChan, modelName), nil
 
 }
 
@@ -96,14 +98,18 @@ func TopoSimulator(cont string, modelName []string) (res model.MqttDatabaseGetTo
 	fmt.Println(json.Unmarshal([]byte(cont), &model1))
 	model2 = model1
 	model2.Body = nil
-	for _, value := range model1.Body{
-		for _, eachModel := range modelName{
-			if (value.Model == eachModel){
+	for _, value := range model1.Body {
+		for _, eachModel := range modelName {
+			if value.Model == eachModel {
 				model2.Body = append(model2.Body, value)
 			}
+
 		}
 	}
+
+	fmt.Println(json.Unmarshal([]byte(cont), &model1))
 	fmt.Println(model2)
+
 	return model2
 }
 

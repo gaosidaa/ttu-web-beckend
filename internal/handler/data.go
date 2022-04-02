@@ -32,6 +32,7 @@ _:
 // DataHistory 按上N条访问历史数据
 func (h *hData) DataHistory(ctx context.Context, req *apiv1.DataHistoryReq) (res *apiv1.DataHistoryRes, err error) {
 	res = &apiv1.DataHistoryRes{}
+	print(req.FrozenType)
 	in := model.MqttDatabaseGetHistoryIn{
 		Token: "633",
 		//TimeType:   "timestartgather",
@@ -39,10 +40,10 @@ func (h *hData) DataHistory(ctx context.Context, req *apiv1.DataHistoryReq) (res
 		//EndTime:    "2022-03-29T23:16:50.296+0800",
 		//TimeSpan:   "5",
 		Timestamp:  "2022-03-29T23:32:49.223+0800",
-		Dev:        "LTU_frozen_3b2ebaac2c6bc90a",
-		UpperN:     "10",
-		FrozenType: "min",
-		Body:       []string{"PhV_phsA"},
+		Dev:        req.Dev,
+		UpperN:     req.UpperN,
+		FrozenType: req.FrozenType,
+		Body:       req.Body,
 		//Body: model.MqttDatabaseGetHistoryInBody{
 		//	Dev:  "LTU_frozen_3b2ebaac2c6bc90a",
 		//	Body: []string{"PhV_phsA"},
@@ -50,7 +51,9 @@ func (h *hData) DataHistory(ctx context.Context, req *apiv1.DataHistoryReq) (res
 	}
 _:
 	gconv.Struct(req, &in)
-	//in.Body.Dev = req.Dev
+	in.Body = []string{"AMax_phsA", "BMax_phsA", "CMax_phsA", "A_phsA", "B_phsA", "C_phsA",
+		"EnvHum", "PhV_phsA", "PhV_phsB", "PhV_phsC", "Tmp", "PTUV_Open_Op_phsA", "PTUV_Open_Op_phsB", "PTUV_Open_Op_phsC",
+		"A_neut", "AMax_neut", "Max_Tmp", "Max_TmpValue"}
 	out, err := service.Mqtt().MqttDatabaseGetHistory(ctx, in)
 	if err != nil {
 		return nil, err
@@ -84,7 +87,7 @@ func (h *hData) DataTopo(ctx context.Context, req *apiv1.DataTopoReq) (res *apiv
 	res = &apiv1.DataTopoRes{}
 	topic := "TestApp/get/request/database/register"
 	in := "{ \"token\":\"123\",\"timestamp\":\"2022-03-21T09:30:08.230+0800\",\"body\":[]}]}"
-	modelName := req.Model
+	modelName := []string{"LTU", "Switch"}
 _:
 	// 传入 请求消息体和 请求主题
 	fmt.Println(in)
