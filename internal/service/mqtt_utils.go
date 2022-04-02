@@ -41,7 +41,7 @@ func registerCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
 
-	realtimeResTmp = string(msg.Payload())
+	topoRes = string(msg.Payload())
 }
 
 func realtimeCallBackFunc(client MQTT.Client, msg MQTT.Message) {

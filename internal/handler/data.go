@@ -63,7 +63,8 @@ _:
 func (h *hData) DataRealtime(ctx context.Context, req *apiv1.DataRealtimeReq) (res *apiv1.DataRealtimeRes, err error) {
 	res = &apiv1.DataRealtimeRes{}
 	topic := "TestApp/get/request/database/realtime"
-	in := "{ \"token\":\"123\",\"timestamp\":\"2022-03-21T09:30:08.230+0800\",\"body\":[{\"dev\":\"" + req.Dev + "\", \"totalcall\":\"0\", \"body\":[\"" + req.Attribute + "\"]}]}"
+	in := "{ \"token\":\"123\",\"timestamp\":\"2022-03-21T09:30:08.230+0800\",\"body\":[{\"dev\":\"" + req.Dev + "\", \"totalcall\":\"" + req.TotalCall + "\", \"body\":[\"" + req.Attribute + "\"]}]}"
+
 _:
 	// 传入 请求消息体和 请求主题
 	fmt.Println(in)

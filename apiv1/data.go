@@ -43,6 +43,7 @@ type DataRealtimeReq struct {
 	g.Meta    `path:"/data/realtime" method:"post" tags:"Data" summary:"获取某一设备的某一属性实时数据"`
 	Dev       string `json:"dev"         v:"required" title:"设备的唯一地址" dc:"由模型和guid组合而成，是数据中心中设备的唯一地址"`
 	Attribute string `json:"attribute" v:"required" title:"设备的属性" dc:"想要获取的某一项设备属性"`
+	TotalCall string `json:"totalCall" v:"required" title:"要全部属性还是单个属性。1 ：所有属性，不用再加属性。 0：加上需要的属性"`
 }
 
 type DataRealtimeRes struct {

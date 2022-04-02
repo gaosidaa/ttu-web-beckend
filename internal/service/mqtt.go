@@ -18,6 +18,7 @@ var FrozenModelList entity.Models
 // 消息全局变量
 var initResTmp string
 var realtimeResTmp string
+var topoRes string
 var historyRestmp model.MqttDatabaseGetHistoryOut
 
 //var realtimeResHum []byte
@@ -82,10 +83,10 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string
 	// 发布消息
 	fmt.Println("发布的消息 " + topic)
 	publish(topic, in)
-	fmt.Println(realtimeResTmp)
+	fmt.Println(topoRes)
 	// 对消息体进行解析
 	time.Sleep(time.Second)
-	return TopoSimulator(realtimeResTmp), nil
+	return TopoSimulator(topoRes), nil
 
 }
 
