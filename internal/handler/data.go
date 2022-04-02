@@ -84,10 +84,11 @@ func (h *hData) DataTopo(ctx context.Context, req *apiv1.DataTopoReq) (res *apiv
 	res = &apiv1.DataTopoRes{}
 	topic := "TestApp/get/request/database/register"
 	in := "{ \"token\":\"123\",\"timestamp\":\"2022-03-21T09:30:08.230+0800\",\"body\":[]}]}"
+	modelName := req.Model
 _:
 	// 传入 请求消息体和 请求主题
 	fmt.Println(in)
-	out, err := service.Mqtt().MqttDatabaseGetTopo(ctx, topic, in)
+	out, err := service.Mqtt().MqttDatabaseGetTopo(ctx, topic, in, modelName)
 	if err != nil {
 		return nil, err
 	}

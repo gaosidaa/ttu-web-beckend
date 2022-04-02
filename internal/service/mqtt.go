@@ -76,7 +76,7 @@ func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, topic string, in st
 	return RealtimeSimulator(realtimeResTmp), nil
 }
 
-func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string) (out model.MqttDatabaseGetTopoOut, err error) {
+func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string, modelName []string) (out model.MqttDatabaseGetTopoOut, err error) {
 	if err != nil {
 		return out, err
 	}
@@ -86,15 +86,25 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string
 	fmt.Println(topoRes)
 	// 对消息体进行解析
 	time.Sleep(time.Second)
-	return TopoSimulator(topoRes), nil
+	return TopoSimulator(topoRes, modelName), nil
 
 }
 
-func TopoSimulator(cont string) (res model.MqttDatabaseGetTopoOut) {
+func TopoSimulator(cont string, modelName []string) (res model.MqttDatabaseGetTopoOut) {
 	var model1 model.MqttDatabaseGetTopoOut
+	var model2 model.MqttDatabaseGetTopoOut
 	fmt.Println(json.Unmarshal([]byte(cont), &model1))
-	fmt.Println(model1)
-	return model1
+	model2 = model1
+	model2.Body = nil
+	for _, value := range model1.Body{
+		for _, eachModel := range modelName{
+			if (value.Model == eachModel){
+				model2.Body = append(model2.Body, value)
+			}
+		}
+	}
+	fmt.Println(model2)
+	return model2
 }
 
 func RealtimeSimulator(cont string) (res model.MqttDatabaseGetRealtimeOut) {

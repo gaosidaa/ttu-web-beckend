@@ -62,6 +62,7 @@ type DataRealtimeResBody struct {
 
 type DataTopoReq struct {
 	g.Meta `path:"/data/register" method:"get" tags:"Data" summary:"获取某一台区的所有设备列表"`
+	Model      []string      `json:"model"                title:"输入需要的模型名"`
 }
 
 type DataTopoRes struct {
