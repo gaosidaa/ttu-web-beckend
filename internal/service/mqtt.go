@@ -16,13 +16,13 @@ var FrozenModelList entity.Models
 
 // 消息全局变量
 var initResTmp string
-var realtimeResTmp string
-var topoRes string
+var realtimeResTmp model.MqttDatabaseGetRealtimeOut
+var topoRes model.MqttDatabaseGetTopoOut
 var historyRestmp model.MqttDatabaseGetHistoryOut
 var (
 	historyChan  = make(chan model.MqttDatabaseGetHistoryOut)
-	realtimeChan = make(chan string)
-	topoChan     = make(chan string)
+	realtimeChan = make(chan model.MqttDatabaseGetRealtimeOut)
+	topoChan     = make(chan model.MqttDatabaseGetTopoOut)
 )
 
 //var realtimeResHum []byte
@@ -56,13 +56,63 @@ func (s *sMqtt) MqttInit(ctx context.Context, in model.EmptyIn) (out model.MqttI
 	return out, err
 }
 
+// MqttDatabaseGetHistory 按时间段获取历史数据
 func (s *sMqtt) MqttDatabaseGetHistory(ctx context.Context, in model.MqttDatabaseGetHistoryIn) (out model.MqttDatabaseGetHistoryOut, err error) {
+	// 如果为空表示查询所有变量
+	if len(in.Body.Body) == 0 {
+		var vals []string
+		// 查询对应的所有变量
+		for _, dev := range DeviceList.DevList {
+			if dev.DevGuid == in.Body.Dev {
+				for _, val := range dev.YCVal {
+					vals = append(vals, val.Name)
+				}
+				for _, val := range dev.YXVal {
+					vals = append(vals, val.Name)
+				}
+				in.Body.Body = vals
+				break
+			}
+		}
+	}
+
 	reqJson, err := json.Marshal(in)
 	if err != nil {
 		return out, err
 	}
 	fmt.Println(string(reqJson))
 	publish(consts.Publish_history_data_get, string(reqJson))
+
+	out = <-historyChan
+	return out, nil
+}
+
+// MqttDatabaseGetHistoryN 按上N条获取历史数据
+func (s *sMqtt) MqttDatabaseGetHistoryN(ctx context.Context, in model.MqttDatabaseGetHistoryInN) (out model.MqttDatabaseGetHistoryOut, err error) {
+	// 如果为空表示查询所有变量
+	if len(in.Body) == 0 {
+		var vals []string
+		// 查询对应的所有变量
+		for _, dev := range DeviceList.DevList {
+			if dev.DevGuid == in.Dev {
+				for _, val := range dev.YCVal {
+					vals = append(vals, val.Name)
+				}
+				for _, val := range dev.YXVal {
+					vals = append(vals, val.Name)
+				}
+				in.Body = vals
+				break
+			}
+		}
+	}
+	reqJson, err := json.Marshal(in)
+	if err != nil {
+		return out, err
+	}
+	fmt.Println(string(reqJson))
+	publish(consts.Publish_history_data_get, string(reqJson))
+
 	out = <-historyChan
 	return out, nil
 }
@@ -75,8 +125,13 @@ func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, topic string, in st
 	fmt.Println("发布的消息 " + topic)
 	publish(topic, in)
 	fmt.Println(realtimeResTmp)
+	realtime, ok := <-realtimeChan
+	for !ok {
+		realtime, ok = <-realtimeChan
+	}
+	//message := <-realtimeChan
 	// 对消息体进行解析
-	return RealtimeSimulator(<-realtimeChan), nil
+	return realtime, nil
 }
 
 func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string, modelName []string) (out model.MqttDatabaseGetTopoOut, err error) {
@@ -88,17 +143,15 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, topic string, in string
 	publish(topic, in)
 	fmt.Println(topoRes)
 	// 对消息体进行解析
-	return TopoSimulator(<-topoChan, modelName), nil
-
+	message := <-topoChan
+	return TopoSimulator(message, modelName), nil
 }
 
-func TopoSimulator(cont string, modelName []string) (res model.MqttDatabaseGetTopoOut) {
-	var model1 model.MqttDatabaseGetTopoOut
+func TopoSimulator(cont model.MqttDatabaseGetTopoOut, modelName []string) (res model.MqttDatabaseGetTopoOut) {
 	var model2 model.MqttDatabaseGetTopoOut
-	fmt.Println(json.Unmarshal([]byte(cont), &model1))
-	model2 = model1
+	model2 = cont
 	model2.Body = nil
-	for _, value := range model1.Body {
+	for _, value := range cont.Body {
 		for _, eachModel := range modelName {
 			if value.Model == eachModel {
 				model2.Body = append(model2.Body, value)
@@ -106,10 +159,7 @@ func TopoSimulator(cont string, modelName []string) (res model.MqttDatabaseGetTo
 
 		}
 	}
-
-	fmt.Println(json.Unmarshal([]byte(cont), &model1))
 	fmt.Println(model2)
-
 	return model2
 }
 

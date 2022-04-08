@@ -29,23 +29,30 @@ type MqttInitOutBodyBody struct {
 	Desc    string `json:"desc"`
 }
 
-// MqttDatabaseGetHistoryIn 历史数据
+// MqttDatabaseGetHistoryIn 按时间段的历史数据
 type MqttDatabaseGetHistoryIn struct {
-	Token      string   `json:"token"`
-	TimeType   string   `json:"time_type"`
-	StartTime  string   `json:"start_time"`
-	EndTime    string   `json:"end_time"`
-	Timestamp  string   `json:"timestamp"`
-	Dev        string   `json:"dev"`
-	UpperN     string   `json:"upperN"`
-	TimeSpan   string   `json:"time_span"`
-	FrozenType string   `json:"frozentype"`
-	Body       []string `json:"body"`
-	//Body       MqttDatabaseGetHistoryInBody `json:"body"`
+	Token      string                       `json:"token"`
+	TimeType   string                       `json:"time_type"`
+	StartTime  string                       `json:"start_time"`
+	EndTime    string                       `json:"end_time"`
+	TimeSpan   string                       `json:"time_span"`
+	FrozenType string                       `json:"frozentype"`
+	Body       MqttDatabaseGetHistoryInBody `json:"body"`
 }
+
 type MqttDatabaseGetHistoryInBody struct {
 	Dev  string   `json:"dev"`
 	Body []string `json:"body"`
+}
+
+// MqttDatabaseGetHistoryInN 按上N条的历史数据
+type MqttDatabaseGetHistoryInN struct {
+	Token      string   `json:"token"`
+	TimeStamp  string   `json:"timestamp"`
+	Dev        string   `json:"dev"`
+	FrozenType string   `json:"frozentype"`
+	UpperN     string   `json:"upperN"`
+	Body       []string `json:"body"`
 }
 
 type MqttDatabaseGetHistoryOut struct {

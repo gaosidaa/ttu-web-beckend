@@ -12,46 +12,43 @@ import (
 
 func deviceCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-	initResTmp = string(msg.Payload())
 }
 
 func schemaCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-
-	//realtimeResTmp = string(msg.Payload())
 }
 
 func modelCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-
-	//realtimeResTmp = string(msg.Payload())
 }
 
 func guidCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-	realtimeChan <- string(msg.Payload())
+
 }
 
 func registerCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-	topoChan <- string(msg.Payload())
+	err := json.Unmarshal(msg.Payload(), &topoRes)
+	if err != nil {
+		fmt.Println(err)
+	}
+	topoChan <- topoRes
 }
 
 func realtimeCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-	// 这一步是将消息进行解析并return
-	realtimeChan <- string(msg.Payload())
+	err := json.Unmarshal(msg.Payload(), &realtimeResTmp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	realtimeChan <- realtimeResTmp
+	//realtimeResTmp = string(msg.Payload())
 }
 
 func hisCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 	// 这一步是将消息进行解析并return
-
 	err := json.Unmarshal(msg.Payload(), &historyRestmp)
 	if err != nil {
 		fmt.Println(err)
