@@ -5,10 +5,10 @@ const (
 	OpenAPIDescription = `物联网平台 `
 	//OpenAPITagNameChat = `Chat`
 	OpenAPITagNameUser = `User`
-	uid                = "123"
+	uid                = "app"
 	MQTTBroker         = "mqtt://sinpower.3322.org:11883"
 	MQTTLAN            = "mqtt://192.168.2.33:1883"
-	MQTTQos            = 0x2
+	MQTTQos            = 0x0
 
 	Publish_device_get        = uid + "/get/request/database/vT"
 	Publish_modelschema_get   = uid + "/get/request/database/modelschema"

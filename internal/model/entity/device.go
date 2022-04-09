@@ -8,31 +8,20 @@ type Devices struct {
 type Device struct {
 	Guid          string `json:"guid"`
 	DevGuid       string `json:"dev"`
-	FrozenGuid    string
 	FrozenDevGuid string
 	AppName       string      `json:"appname"`
 	IsReport      string      `json:"isReport"`
 	ManuID        string      `json:"manuID"`
-	Init          DevicePort  `json:"devDesc"`
+	Port          DevicePort  `json:"devDesc"`
 	Model         DeviceModel `json:"model"`
-	FrozenModel   DeviceModel
-	Connection    DeviceConnection `json:"port"`
-	YXVal         []DeviceVal      `json:"yx"`
-	YCVal         []DeviceVal      `json:"yc"`
+	YXVal         []DeviceVal `json:"yx"`
+	YCVal         []DeviceVal `json:"yc"`
 }
 
 type DevicePort struct {
 	Port        string `json:"port"`
 	Address     string `json:"addr"`
 	Description string `json:"desc"`
-	ModelName   string `json:"model"`
-}
-
-type DeviceConnection struct {
-	Baud    string `json:"Baud"`
-	Bit     string `json:"bit"`
-	StopBit string `json:"stop_bit"`
-	Parity  string `json:"Parity"`
 }
 
 type DeviceVal struct {

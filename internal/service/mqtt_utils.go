@@ -7,6 +7,17 @@ import (
 	"ttu-backend/internal/consts"
 )
 
+var mqttClient MQTT.Client
+
+func init() {
+	var b bool
+	b, mqttClient = connMQTT(consts.MQTTLAN)
+	if !b {
+		fmt.Println("pub connMQTT failed")
+		return
+	}
+}
+
 // 各订阅接口的回调函数和MQTT连接，发送功能函数
 // 通过全局变量传递信息
 
@@ -24,7 +35,6 @@ func modelCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 
 func guidCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-
 }
 
 func registerCallBackFunc(client MQTT.Client, msg MQTT.Message) {
@@ -43,7 +53,6 @@ func realtimeCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 		fmt.Println(err)
 	}
 	realtimeChan <- realtimeResTmp
-	//realtimeResTmp = string(msg.Payload())
 }
 
 func hisCallBackFunc(client MQTT.Client, msg MQTT.Message) {
@@ -58,10 +67,6 @@ func hisCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 
 func initCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
-}
-
-func emptyMessage() (str string) {
-	return ""
 }
 
 // 连接MQTT服务
@@ -87,11 +92,6 @@ func connMQTT(broker string) (bool, MQTT.Client) {
 
 // 发布消息
 func publish(topic string, str string) {
-	b, mc := connMQTT(consts.MQTTLAN)
-	if !b {
-		fmt.Println("pub connMQTT failed")
-		return
-	}
 	// 发送
-	mc.Publish(topic, consts.MQTTQos, true, str)
+	mqttClient.Publish(topic, consts.MQTTQos, true, str)
 }
