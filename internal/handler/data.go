@@ -89,8 +89,12 @@ _:
 	}
 _:
 	//gconv.Struct(out.Body[0], &res)
-	gconv.Struct(out.Body[0], &res)
-	return res, nil
+	if len(out.Body) != 0 {
+		gconv.Struct(out.Body[0], &res)
+		return res, nil
+	} else {
+		return res, fmt.Errorf("no realtime data")
+	}
 }
 
 func (h *hData) DataTopo(ctx context.Context, req *apiv1.DataTopoReq) (res *apiv1.DataTopoRes, err error) {
