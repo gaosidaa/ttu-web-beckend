@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/protocol/goai"
 	"ttu-backend/internal/consts"
 
@@ -28,8 +29,10 @@ var (
 			enhanceOpenAPIDoc(s)
 			//g.SetDebug(true)
 			s.SetIndexFolder(true)
-			s.AddStaticPath("/", "/dist")
-			s.AddSearchPath("/dist")
+			if gfile.Exists("dist") {
+				s.AddStaticPath("/", "/dist")
+				s.AddSearchPath("/dist")
+			}
 			s.Run()
 			return nil
 		},
