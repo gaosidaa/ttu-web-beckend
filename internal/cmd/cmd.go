@@ -23,6 +23,7 @@ var (
 				group.Middleware(MiddlewareCORS)
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
+					handler.Base,
 					handler.Data,
 				)
 			})

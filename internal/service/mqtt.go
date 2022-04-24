@@ -122,10 +122,10 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, in string, modelName []
 	fmt.Println("发布的消息 " + in)
 	publish(consts.Publish_register_get, in)
 	// 对消息体进行解析
-	return TopoSimulator(<-topoChan, modelName), nil
+	return TopoHandler(<-topoChan, modelName), nil
 }
 
-func TopoSimulator(cont model.MqttDatabaseGetTopoOut, modelName []string) (res model.MqttDatabaseGetTopoOut) {
+func TopoHandler(cont model.MqttDatabaseGetTopoOut, modelName []string) (res model.MqttDatabaseGetTopoOut) {
 	var info model.MqttDatabaseGetTopoOut
 	info = cont
 	info.Body = nil
@@ -168,4 +168,32 @@ func TopoSimulator(cont model.MqttDatabaseGetTopoOut, modelName []string) (res m
 	}
 
 	return info
+}
+
+func GetFrozenDev(Dev string) string {
+	for _, dev := range DeviceList.DevList {
+		if dev.DevGuid == Dev {
+			return dev.FrozenDevGuid
+		}
+	}
+	return ""
+}
+func GetModelNameByDev(Dev string) string {
+	for _, dev := range DeviceList.DevList {
+		if dev.DevGuid == Dev || dev.FrozenDevGuid == Dev {
+			return dev.Model.Name
+		}
+	}
+	return ""
+}
+func GetModelParasByDev(Dev string) []string {
+	paras := make([]string, 0)
+	modelName := GetModelNameByDev(Dev)
+	for k, _ := range consts.ModelConfig[modelName].Mapping {
+		paras = append(paras, k)
+	}
+	return paras
+}
+func init() {
+
 }

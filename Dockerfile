@@ -1,4 +1,4 @@
-FROM loads/alpine:3.8
+FROM --platform=$TARGETPLATFORM alpine
 
 ###############################################################################
 #                                INSTALLATION
@@ -7,8 +7,8 @@ FROM loads/alpine:3.8
 ENV WORKDIR  /app
 
 ADD resource $WORKDIR/
-
-ADD ./ttu_backend_arm_linux $WORKDIR/main
+ADD manifest/config/config.yaml $WORKDIR/config.yaml
+ADD ttu_backend_arm_linux $WORKDIR/main
 
 RUN chmod +x $WORKDIR/main
 
