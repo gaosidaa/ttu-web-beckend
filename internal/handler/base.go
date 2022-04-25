@@ -42,3 +42,15 @@ func (h *hBase) Alarm(ctx context.Context, req *apiv1.AlarmReq) (res *apiv1.Alar
 
 	return res, nil
 }
+func (h *hBase) FaultWaveform(ctx context.Context, req *apiv1.FaultWaveformReq) (res *apiv1.FaultWaveformRes, err error) {
+
+	return res, nil
+}
+func (h *hBase) SetConfig(ctx context.Context, req *apiv1.SetConfigReq) (res *apiv1.SetConfigRes, err error) {
+
+	return res, nil
+}
+func (h *hBase) GetConfig(ctx context.Context, req *apiv1.GetConfigReq) (res *apiv1.GetConfigRes, err error) {
+
+	return res, nil
+}

@@ -3,8 +3,9 @@ package consts
 const (
 	uid        = "app"
 	MQTTBroker = "mqtt://sinpower.3322.org:11883"
-	MQTTLAN    = "mqtt://192.168.2.33:1883"
-	MQTTQos    = 0x0
+	//MQTTLAN    = "mqtt://192.168.2.33:1883"
+	MQTTLAN = "mqtt://47.110.134.175:8183"
+	MQTTQos = 0x0
 
 	Publish_device_get        = uid + "/get/request/database/vT"
 	Publish_modelschema_get   = uid + "/get/request/database/modelschema"

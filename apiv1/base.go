@@ -71,6 +71,7 @@ type RecordResRecord struct {
 // AlarmReq 获取告警事件
 type AlarmReq struct {
 	g.Meta    `path:"/base/alarm" method:"post" tags:"Base" summary:"获取告警事件"`
+	Dev       string `json:"dev"      v:"required"    title:"设备的唯一地址"`
 	StartTime string `json:"start_time"  title:"开始时间" dc:""`
 	EndTime   string `json:"end_time"    title:"结束时间" dc:""`
 }
@@ -83,4 +84,51 @@ type AlarmResAlarm struct {
 	AlarmType string      `json:"alarm_type"     title:"事件类型"`
 	Remark    string      `json:"remark"         title:"事件说明"`
 	Status    string      `json:"status"         title:"事件状态"`
+}
+
+// FaultWaveformReq 获取故障波形
+type FaultWaveformReq struct {
+	g.Meta    `path:"/base/faultWaveform" method:"post" tags:"Base" summary:"获取故障波形"`
+	Dev       string      `json:"dev"   v:"required"       title:"设备的唯一地址"`
+	Timestamp *gtime.Time `json:"time"  v:"required"       title:"告警时间"`
+}
+
+type FaultWaveformRes struct {
+	Waveform []FaultWaveformResWaveform `json:"waveform"   title:"故障波形"`
+}
+type FaultWaveformResWaveform struct {
+	OffsetTime float64 `json:"time"           title:"偏移时间"`
+	In         float32 `json:"In"             title:"漏电电流"`
+	Ia         float32 `json:"Ia"             title:"A相电流"`
+	Ib         float32 `json:"Ib"             title:"B相电流"`
+	Ic         float32 `json:"Ic"             title:"C相电流"`
+}
+
+// SetConfigReq 设置配置参数
+type SetConfigReq struct {
+	g.Meta                            `path:"/base/setConfig" method:"post" tags:"Base" summary:"设置配置参数"`
+	Dev                               string `json:"dev"    v:"required"      title:"设备的唯一地址"`
+	LeakageProtectionStatus           string `json:"leakage_protection_status"           v:"required" title:"漏电保护状态"`
+	RatedProtectionCurrentThreshold   int    `json:"rated_protection_current_threshold"  v:"required" title:"额定保护电流阈值"`
+	ThresholdProtectionActionTime     int    `json:"threshold_protection_action_time"    v:"required" title:"阈值保护动作时间"`
+	RatedLeakageProtectionDifference  int    `json:"rated_leakage_protection_difference" v:"required" title:"额定漏电保护差值"`
+	InterpolationProtectionActionTime int    `json:"interpolation_protection_action_time" v:"required" title:"插值保护动作时间"`
+}
+
+type SetConfigRes struct {
+}
+
+// GetConfigReq 获取配置参数
+type GetConfigReq struct {
+	g.Meta `path:"/base/getConfig" method:"post" tags:"Base" summary:"获取配置参数"`
+	Dev    string `json:"dev"    v:"required"      title:"设备的唯一地址"`
+}
+
+type GetConfigRes struct {
+	Dev                               string `json:"dev"          title:"设备的唯一地址"`
+	LeakageProtectionStatus           string `json:"leakage_protection_status"            title:"漏电保护状态"`
+	RatedProtectionCurrentThreshold   int    `json:"rated_protection_current_threshold"   title:"额定保护电流阈值"`
+	ThresholdProtectionActionTime     int    `json:"threshold_protection_action_time"     title:"阈值保护动作时间"`
+	RatedLeakageProtectionDifference  int    `json:"rated_leakage_protection_difference"  title:"额定漏电保护差值"`
+	InterpolationProtectionActionTime int    `json:"interpolation_protection_action_time" title:"插值保护动作时间"`
 }

@@ -24,7 +24,7 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					handler.Base,
-					handler.Data,
+					//handler.Data,
 				)
 			})
 			enhanceOpenAPIDoc(s)
