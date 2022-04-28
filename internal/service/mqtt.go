@@ -17,10 +17,18 @@ var ModelList entity.Models
 var realtimeResTmp model.MqttDatabaseGetRealtimeOut
 var topoRes model.MqttDatabaseGetTopoOut
 var historyRestmp model.MqttDatabaseGetHistoryOut
+var alarmRes model.MqttDataBaseGetAlarmOut
+var getConfigRes model.MqttDataBaseGetConfigOut
+var setConfigRes model.MqttDataBaseSetConfigOut
+var faultWaveform model.BaseFaultWaveformOut
 var (
-	historyChan  = make(chan model.MqttDatabaseGetHistoryOut)
-	realtimeChan = make(chan model.MqttDatabaseGetRealtimeOut)
-	topoChan     = make(chan model.MqttDatabaseGetTopoOut)
+	historyChan       = make(chan model.MqttDatabaseGetHistoryOut)
+	realtimeChan      = make(chan model.MqttDatabaseGetRealtimeOut)
+	topoChan          = make(chan model.MqttDatabaseGetTopoOut)
+	alarmChan         = make(chan model.MqttDataBaseGetAlarmOut)
+	faultWaveformChan = make(chan model.BaseFaultWaveformOut)
+	getConfigChan     = make(chan model.MqttDataBaseGetConfigOut)
+	setConfigChan     = make(chan model.MqttDataBaseSetConfigOut)
 )
 
 type (

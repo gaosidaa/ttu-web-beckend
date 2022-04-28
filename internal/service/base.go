@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"strconv"
+	"strings"
 	"time"
 	"ttu-backend/internal/consts"
 	"ttu-backend/internal/model"
@@ -145,6 +146,7 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 			Body: GetModelParasByDev(in.Dev),
 		},
 	})
+	fmt.Println(string(msg))
 	publish(consts.Publish_history_data_get, string(msg))
 	history := model.MqttDatabaseGetHistoryOut{}
 	select {
@@ -178,5 +180,151 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 	return out, nil
 }
 func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.BaseAlarmOut, err error) {
-	return
+	//fmt.Println(in)
+	msg, _ := json.Marshal(model.MqttDataBaseGetAlarmIn{
+		Token:     "1000",
+		Time_type: "timestartgather",
+		StartTime: gtime.NewFromStr(in.StartTime).Layout("2006-01-02T15:04:05.000-0700"),
+		EndTime:   gtime.NewFromStr(in.EndTime).Layout("2006-01-02T15:04:05.000-0700"),
+		SourType:  "104",
+		Body: []model.MqttDataBaseGetAlarmInBody{
+			{
+				Model:    strings.Split(in.Dev, "_")[0],
+				Totaldev: "0",
+				Dev: []string{
+					in.Dev,
+				},
+			},
+		},
+	})
+	fmt.Println(string(msg))
+	publish(consts.Publish_alarm_data_get, string(msg))
+	alarmData := model.MqttDataBaseGetAlarmOut{}
+	//fmt.Println(alarm_data)
+	select {
+	case alarmData = <-alarmChan:
+	case <-time.After(3 * time.Second):
+		err = fmt.Errorf("读取超时")
+		return
+	}
+	out = model.BaseAlarmOut{
+		Alarm: []model.AlarmResAlarm{},
+	}
+	for _, bb := range alarmData.Body {
+		alarm := model.AlarmResAlarm{}
+		alarm.Timestamp = gtime.NewFromStr(bb.Timestamp)
+		alarm.AlarmType = bb.Event //consts.AlarmDict[bb.Event]
+		alarm.Remark = "分->合"
+		alarm.Status = "已读"
+		out.Alarm = append(out.Alarm, alarm)
+	}
+	//fmt.Println(alarmChan)
+	//fmt.Println(len(alarmChan))
+
+	return out, nil
+}
+func (s *sBase) BaseFaultWaveform(ctx context.Context, in model.BaseFaultWaveformIn) (out model.BaseFaultWaveformOut, err error) {
+	// 获取已有的alarmRes，找到对应时间戳
+	out = model.BaseFaultWaveformOut{
+		Waveform: []model.BaseFaultWaveformOutBody{},
+	}
+	alarmTime, _ := time.Parse("2006-01-02T15:04:05.000+0800", in.Timestamp.Time.Format("2006-01-02T15:04:05.000+0800")) // 记录告警的时间
+	fmt.Println(alarmTime)
+	for _, bb := range alarmRes.Body {
+		fmt.Println(123)
+		fmt.Println(bb.Timestamp)
+		time2, _ := time.Parse("2006-01-02T15:04:05.000+0800", bb.Timestamp)
+		//time1 := gtime.NewFromStr(bb.Timestamp).Layout("2006-01-02T15:04:05.000-0700")
+		fmt.Println(time2)
+		if alarmTime == time2 {
+			for i := 0; i < len(bb.Extdata)/4; i++ {
+				wave := model.BaseFaultWaveformOutBody{}
+				newTime, _ := time.Parse("2006-01-02T15:04:05.000+0800", bb.Extdata[i*4].Timestamp)
+
+				wave.OffsetTime = (newTime.Sub(alarmTime)).Seconds()
+				value0, _ := strconv.ParseFloat(bb.Extdata[i*4].Val, 64)
+				wave.Ia = float32(value0)
+				value1, _ := strconv.ParseFloat(bb.Extdata[i*4+1].Val, 64)
+				wave.Ib = float32(value1)
+				value2, _ := strconv.ParseFloat(bb.Extdata[i*4+2].Val, 64)
+				wave.Ic = float32(value2)
+				value3, _ := strconv.ParseFloat(bb.Extdata[i*4+3].Val, 64)
+				wave.In = float32(value3)
+				out.Waveform = append(out.Waveform, wave)
+			}
+		}
+	}
+	return out, nil
+
+}
+
+func (s *sBase) BaseGetConfig(ctx context.Context, in model.BaseGetConfigIn) (out model.BaseGetConfigOut, err error) {
+
+	msg, _ := json.Marshal(model.MqttDataBaseGetConfigIn{
+		Dev: in.Dev,
+	})
+	fmt.Println(string(msg))
+	publish(consts.Publish_getParams, string(msg))
+	getConfigData := model.MqttDataBaseGetConfigOut{}
+	fmt.Println(getConfigData)
+	select {
+	case getConfigData = <-getConfigChan:
+	case <-time.After(3 * time.Second):
+		err = fmt.Errorf("读取超时")
+		return
+	}
+	out = model.BaseGetConfigOut{
+		Dev: getConfigData.Dev,
+	}
+	if len(getConfigData.Body) > 4 {
+		out.LeakageProtectionStatus = getConfigData.Body[0].Val
+		out.RatedProtectionCurrentThreshold, _ = strconv.Atoi(getConfigData.Body[1].Val)
+		out.ThresholdProtectionActionTime, _ = strconv.Atoi(getConfigData.Body[2].Val)
+		out.RatedLeakageProtectionDifference, _ = strconv.Atoi(getConfigData.Body[3].Val)
+		out.InterpolationProtectionActionTime, _ = strconv.Atoi(getConfigData.Body[4].Val)
+	}
+
+	fmt.Println(getConfigData)
+
+	return out, nil
+}
+
+func (s *sBase) BaseSetConfig(ctx context.Context, in model.BaseSetConfigIn) (out model.BaseSetConfigOut, err error) {
+	msg, _ := json.Marshal(model.MqttDataBaseSetConfigIn{
+		Dev: in.Dev,
+		Body: []model.MqttDatabaseSetConfigInBody{
+			{
+				Name: "1",
+				Val:  in.LeakageProtectionStatus,
+			},
+			{
+				Name: "2",
+				Val:  strconv.Itoa(in.InterpolationProtectionActionTime),
+			},
+			{
+				Name: "3",
+				Val:  strconv.Itoa(in.RatedLeakageProtectionDifference),
+			},
+			{
+				Name: "4",
+				Val:  strconv.Itoa(in.RatedProtectionCurrentThreshold),
+			},
+			{
+				Name: "5",
+				Val:  strconv.Itoa(in.ThresholdProtectionActionTime),
+			},
+		},
+	})
+	fmt.Println(string(msg))
+	publish(consts.Publish_setParams, string(msg))
+	setConfigData := model.MqttDataBaseSetConfigOut{}
+	select {
+	case setConfigData = <-setConfigChan:
+	case <-time.After(3 * time.Second):
+		err = fmt.Errorf("读取超时")
+		return
+	}
+	fmt.Println(setConfigData)
+	out = model.BaseSetConfigOut{}
+	return out, nil
 }

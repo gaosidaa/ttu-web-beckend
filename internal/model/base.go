@@ -58,6 +58,7 @@ type RecordResRecord struct {
 type BaseAlarmIn struct {
 	StartTime string `json:"start_time"  v:"" title:"开始时间" dc:""`
 	EndTime   string `json:"end_time"    v:"" title:"结束时间" dc:""`
+	Dev       string `json:"dev" v:"" title:"设备的唯一编号"`
 }
 type BaseAlarmOut struct {
 	Alarm []AlarmResAlarm `json:"alarm"                title:"告警事件"`
@@ -67,4 +68,47 @@ type AlarmResAlarm struct {
 	AlarmType string      `json:"alarm_type"     title:"事件类型"`
 	Remark    string      `json:"remark"         title:"事件说明"`
 	Status    string      `json:"status"         title:"事件状态"`
+}
+
+// 波形
+type BaseFaultWaveformIn struct {
+	Dev       string      `json:"dev"         title:"设备的唯一地址"`
+	Timestamp *gtime.Time `json:"time"         title:"告警时间"`
+}
+
+type BaseFaultWaveformOut struct {
+	Waveform []BaseFaultWaveformOutBody `json:"waveform"   title:"故障波形"`
+}
+
+type BaseFaultWaveformOutBody struct {
+	OffsetTime float64 `json:"time"           title:"偏移时间"`
+	In         float32 `json:"In"             title:"漏电电流"`
+	Ia         float32 `json:"Ia"             title:"A相电流"`
+	Ib         float32 `json:"Ib"             title:"B相电流"`
+	Ic         float32 `json:"Ic"             title:"C相电流"`
+}
+
+type BaseGetConfigIn struct {
+	Dev string `json:"dev" title:"设备的唯一编号"`
+}
+
+type BaseGetConfigOut struct {
+	Dev                               string `json:"dev" title:"设备的唯一编号"`
+	LeakageProtectionStatus           string `json:"leakage_protection_status" title:"漏电保护状态"`
+	RatedProtectionCurrentThreshold   int    `json:"rated_protection_current_threshold" title:"额定保护电流阈值"`
+	ThresholdProtectionActionTime     int    `json:"threshold_protection_action_time" title:"阈值保护动作时间"`
+	RatedLeakageProtectionDifference  int    `json:"rated_leakage_protection_difference" title:"额定漏电保护差值"`
+	InterpolationProtectionActionTime int    `json:"interpolation_protection_action_time" title:"插值保护动作时间"`
+}
+
+type BaseSetConfigIn struct {
+	Dev                               string `json:"dev" title:"设备的唯一编号"`
+	LeakageProtectionStatus           string `json:"leakage_protection_status" title:"漏电保护状态"`
+	RatedProtectionCurrentThreshold   int    `json:"rated_protection_current_threshold" title:"额定保护电流阈值"`
+	ThresholdProtectionActionTime     int    `json:"threshold_protection_action_time" title:"阈值保护动作时间"`
+	RatedLeakageProtectionDifference  int    `json:"rated_leakage_protection_difference" title:"额定漏电保护差值"`
+	InterpolationProtectionActionTime int    `json:"interpolation_protection_action_time" title:"插值保护动作时间"`
+}
+
+type BaseSetConfigOut struct {
 }

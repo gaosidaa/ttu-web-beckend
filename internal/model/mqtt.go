@@ -76,8 +76,6 @@ type MqttDatabaseGetHistoryOutBodyBodyBody struct {
 	Val  string `json:"val"`
 }
 
-// 实时数据,另一个角度，将
-
 type MqttDatabaseGetRealtimeIn struct {
 	Token     string                          `json:"token"`
 	Timestamp string                          `json:"timestamp"`
@@ -134,4 +132,82 @@ type MqttDatabaseGetTopoOutBodyBody struct {
 	Isreport  string `json:"isreport"`
 	NodeID    string `json:"nodeID"`
 	ProductID string `json:"productID"`
+}
+
+// 告警
+type MqttDataBaseGetAlarmIn struct {
+	Token     string                       `json:"token"`
+	Time_type string                       `json:"time_type"`
+	StartTime string                       `json:"start_time"`
+	EndTime   string                       `json:"end_time"`
+	SourType  string                       `json:"SourType"`
+	Body      []MqttDataBaseGetAlarmInBody `json:"body"`
+}
+
+type MqttDataBaseGetAlarmInBody struct {
+	Model    string   `json:"model"`
+	Totaldev string   `json:"totaldev"`
+	Dev      []string `json:"dev"`
+}
+
+type MqttDataBaseGetAlarmOut struct {
+	Token     string                        `json:"token"`
+	Timestamp string                        `json:"timestamp"`
+	Body      []MqttDataBaseGetAlarmOutBody `json:"body"`
+}
+
+type MqttDataBaseGetAlarmOutBody struct {
+	Appname         string          `json:"appname"`
+	SourType        string          `json:"SourType"`
+	Model           string          `json:"model"`
+	Dev             string          `json:"dev"`
+	Event           string          `json:"event"`
+	Timestamp       string          `json:"timestamp"`
+	Timestartgather string          `json:"timestartgather"`
+	Timeendgather   string          `json:"timeendgather"`
+	Startimestamp   string          `json:"starttimestamp"`
+	Endtimestamp    string          `json:"endtimestamp"`
+	HappenSrc       string          `json:"HappenSrc"`
+	IsNeedRpt       string          `json:"IsNeedRpt"`
+	occurnum        string          `json:"occurnum"`
+	EventLevel      string          `json:"EventLevel"`
+	RptStatus       []RptStatusBody `json:"RptStatus"`
+	Data            string          `json:"data"`
+	Extdata         []ExtdataBody   `json:"extdata"`
+}
+
+type RptStatusBody struct {
+	Net1 string `json:"Net-1"`
+	Eth1 string `json:"Eth-1"`
+}
+
+type ExtdataBody struct {
+	Name      string `json:"name"`
+	Val       string `json:"val"`
+	Timestamp string `json:"timestamp"`
+}
+
+// get参数
+type MqttDataBaseGetConfigIn struct {
+	Dev string `json:"dev"`
+}
+
+type MqttDataBaseGetConfigOut struct {
+	Dev  string                        `json:"dev"`
+	Body []MqttDatabaseSetConfigInBody `json:"body"`
+}
+
+// set
+type MqttDataBaseSetConfigIn struct {
+	Dev  string                        `json:"dev"`
+	Body []MqttDatabaseSetConfigInBody `json:"body"`
+}
+
+type MqttDatabaseSetConfigInBody struct {
+	Name string `json:"name" title:"变量名称"`
+	Val  string `json:"val" title:"变量数值"`
+}
+type MqttDataBaseSetConfigOut struct {
+	Dev    string `json:"dev"`
+	Status string `json:"status"`
 }

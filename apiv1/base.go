@@ -71,7 +71,7 @@ type RecordResRecord struct {
 // AlarmReq 获取告警事件
 type AlarmReq struct {
 	g.Meta    `path:"/base/alarm" method:"post" tags:"Base" summary:"获取告警事件"`
-	Dev       string `json:"dev"      v:"required"    title:"设备的唯一地址"`
+	Dev       string `json:"dev"      v:"required"    title:"设备类型" dc:"设备的唯一地址"`
 	StartTime string `json:"start_time"  title:"开始时间" dc:""`
 	EndTime   string `json:"end_time"    title:"结束时间" dc:""`
 }

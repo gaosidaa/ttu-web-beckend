@@ -20,7 +20,33 @@ func init() {
 
 // 各订阅接口的回调函数和MQTT连接，发送功能函数
 // 通过全局变量传递信息
+func getParamsCallBackFunc(client MQTT.Client, msg MQTT.Message) {
+	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
+	err := json.Unmarshal(msg.Payload(), &getConfigRes)
+	if err != nil {
+		fmt.Println(err)
+	}
+	getConfigChan <- getConfigRes
+}
 
+func setParamsCallBackFunc(client MQTT.Client, msg MQTT.Message) {
+	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
+	err := json.Unmarshal(msg.Payload(), &setConfigRes)
+	if err != nil {
+		fmt.Println(err)
+	}
+	setConfigChan <- setConfigRes
+
+}
+
+func alarmCallBackFunc(client MQTT.Client, msg MQTT.Message) {
+	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
+	err := json.Unmarshal(msg.Payload(), &alarmRes)
+	if err != nil {
+		fmt.Println(err)
+	}
+	alarmChan <- alarmRes
+}
 func deviceCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 }
@@ -87,6 +113,10 @@ func connMQTT(broker string) (bool, MQTT.Client) {
 	mc.Subscribe(consts.Received_modelschema_get, consts.MQTTQos, schemaCallBackFunc)
 	mc.Subscribe(consts.Received_model_get, consts.MQTTQos, modelCallBackFunc)
 	mc.Subscribe(consts.Received_initData, consts.MQTTQos, initCallBackFunc)
+	mc.Subscribe(consts.Received_alarm_data_get, consts.MQTTQos, alarmCallBackFunc)
+	mc.Subscribe(consts.Received_setParams, consts.MQTTQos, setParamsCallBackFunc)
+	mc.Subscribe(consts.Received_getParams, consts.MQTTQos, getParamsCallBackFunc)
+	mc.Subscribe(consts.Received_history_data_get, consts.MQTTQos, hisCallBackFunc)
 	return true, mc
 }
 
