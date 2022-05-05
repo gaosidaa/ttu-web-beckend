@@ -14,7 +14,7 @@ type UserLoginRes struct {
 }
 
 type UserChangePasswordReq struct {
-	g.Meta      `path:"/user/changePassword" tags:"User" method:"post" summary:"用户登录"`
+	g.Meta      `path:"/user/changePassword" tags:"User" method:"post" summary:"用户修改密码"`
 	Username    string `json:"username" v:"required" title:"用户名"`
 	OldPassword string `json:"oldPassword" v:"required" title:"旧密码"`
 	NewPassword string `json:"newPassword" v:"required" title:"新密码"`
