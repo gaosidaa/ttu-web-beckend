@@ -132,3 +132,17 @@ type GetConfigRes struct {
 	RatedLeakageProtectionDifference  int    `json:"rated_leakage_protection_difference"  title:"额定漏电保护差值"`
 	InterpolationProtectionActionTime int    `json:"interpolation_protection_action_time" title:"插值保护动作时间"`
 }
+
+// 漏电分析
+// 获取日分析
+// GetConfigReq 获取配置参数
+type DayAnaReq struct {
+	g.Meta    `path:"/base/dayAnalysis" method:"post" tags:"Base" summary:"获取日分析"`
+	Dev       string      `json:"dev"    v:"required"      title:"设备的唯一地址"`
+	StartTime *gtime.Time `json:"start_time"  title:"开始时间" dc:""`
+	EndTime   *gtime.Time `json:"end_time"    title:"结束时间" dc:""`
+}
+
+type DayAnaRes struct {
+	DayAna [24][7]int `json:"dayAna" title:"[小时][星期几]"`
+}

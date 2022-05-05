@@ -236,6 +236,8 @@ func (s *sBase) BaseFaultWaveform(ctx context.Context, in model.BaseFaultWavefor
 		time2, _ := time.Parse("2006-01-02T15:04:05.000+0800", bb.Timestamp)
 		//time1 := gtime.NewFromStr(bb.Timestamp).Layout("2006-01-02T15:04:05.000-0700")
 		fmt.Println(time2)
+		//fmt.Println(time2.Weekday()) 可以获得星期几
+		//fmt.Println(time2.Hour()) 可以获得小时
 		if alarmTime == time2 {
 			for i := 0; i < len(bb.Extdata)/4; i++ {
 				wave := model.BaseFaultWaveformOutBody{}
@@ -326,5 +328,77 @@ func (s *sBase) BaseSetConfig(ctx context.Context, in model.BaseSetConfigIn) (ou
 	}
 	fmt.Println(setConfigData)
 	out = model.BaseSetConfigOut{}
+	return out, nil
+}
+
+func (s *sBase) BaseDayAnalysis(ctx context.Context, in model.BaseDayAnaIn) (out model.BaseDayAnaOut, err error) {
+
+	msg, _ := json.Marshal(model.MqttDataBaseGetAlarmIn{
+		Token:     "1000",
+		Time_type: "timestartgather",
+		StartTime: gtime.NewFromStr(in.StartTime.String()).Layout("2006-01-02T15:04:05.000-0700"),
+		EndTime:   gtime.NewFromStr(in.EndTime.EndOfDay().String()).Layout("2006-01-02T15:04:05.000-0700"),
+		SourType:  "104",
+		Body: []model.MqttDataBaseGetAlarmInBody{
+			{
+				Model:    strings.Split(in.Dev, "_")[0],
+				Totaldev: "0",
+				Dev: []string{
+					in.Dev,
+				},
+			},
+		},
+	})
+
+	fmt.Println(string(msg))
+	publish(consts.Publish_alarm_data_get, string(msg))
+	alarmData := model.MqttDataBaseGetAlarmOut{}
+	//fmt.Println(alarm_data)
+	select {
+	case alarmData = <-alarmChan:
+	case <-time.After(10 * time.Second):
+		err = fmt.Errorf("读取超时")
+		return
+	}
+	out = model.BaseDayAnaOut{
+		DayAna: [24][7]int{},
+	}
+	fmt.Println(len(alarmData.Body))
+	for _, bb := range alarmData.Body {
+		hour := gtime.NewFromStr(bb.Timestamp).Hour()
+
+		day := gtime.NewFromStr(bb.Timestamp).Weekday().String()[0:2]
+		//fmt.Println(bb.Timestamp)
+		//fmt.Print(hour)
+		//fmt.Print(", ")
+		//fmt.Print(day)
+		switch {
+		case day == "Mo":
+			out.DayAna[hour][0] += 1
+			//fmt.Println("+1")
+		case day == "Tu":
+			out.DayAna[hour][1] += 1
+			//fmt.Println("+1")
+		case day == "We":
+			out.DayAna[hour][2] += 1
+			//fmt.Println("+1")
+		case day == "Th":
+			out.DayAna[hour][3] += 1
+			//fmt.Println("+1")
+		case day == "Fr":
+			out.DayAna[hour][4] += 1
+			//fmt.Println("+1")
+		case day == "Sa":
+			out.DayAna[hour][5] += 1
+			//fmt.Println("+1")
+		case day == "Su":
+			out.DayAna[hour][6] += 1
+			//fmt.Println("+1")
+		}
+	}
+	//fmt.Println(alarmChan)
+	//fmt.Println(len(alarmChan))
+	fmt.Println(out.DayAna)
+
 	return out, nil
 }

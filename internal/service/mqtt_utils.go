@@ -40,7 +40,7 @@ func setParamsCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 }
 
 func alarmCallBackFunc(client MQTT.Client, msg MQTT.Message) {
-	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
+	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic())
 	err := json.Unmarshal(msg.Payload(), &alarmRes)
 	if err != nil {
 		fmt.Println(err)

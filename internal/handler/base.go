@@ -73,3 +73,13 @@ func (h *hBase) GetConfig(ctx context.Context, req *apiv1.GetConfigReq) (res *ap
 	_ = gconv.Struct(out, &res)
 	return res, err
 }
+
+func (h *hBase) DayAnalysis(ctx context.Context, req *apiv1.DayAnaReq) (res *apiv1.DayAnaRes, err error) {
+	in := model.BaseDayAnaIn{}
+	_ = gconv.Struct(req, &in)
+	out, err := service.Base().BaseDayAnalysis(ctx, in)
+	//fmt.Println(out.DayAna)
+	res = &apiv1.DayAnaRes{}
+	_ = gconv.Struct(out, &res)
+	return res, err
+}

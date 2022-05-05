@@ -112,3 +112,13 @@ type BaseSetConfigIn struct {
 
 type BaseSetConfigOut struct {
 }
+
+type BaseDayAnaIn struct {
+	Dev       string      `json:"dev"    v:"required"      title:"设备的唯一地址"`
+	StartTime *gtime.Time `json:"start_time"  title:"开始时间" dc:""`
+	EndTime   *gtime.Time `json:"end_time"    title:"结束时间" dc:""`
+}
+
+type BaseDayAnaOut struct {
+	DayAna [24][7]int `json:"dayAna" title:"[小时][星期几]"`
+}
