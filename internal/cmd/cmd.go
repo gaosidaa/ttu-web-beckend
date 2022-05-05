@@ -24,6 +24,7 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					handler.Base,
+					handler.User,
 					//handler.Data,
 				)
 			})
