@@ -1,6 +1,6 @@
 package model
 
 type User struct {
-	Id       string `json:"id"`
-	Password string `json:"password"`
+	Id       string `yaml:"id"`
+	Password string `yaml:"password"`
 }

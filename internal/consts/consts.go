@@ -7,16 +7,10 @@ const (
 	MQTTLAN = "mqtt://47.110.134.175:8183"
 	MQTTQos = 0x0
 
-	Publish_device_get        = uid + "/get/request/database/vT"
-	Publish_modelschema_get   = uid + "/get/request/database/modelschema"
-	Publish_model_get         = uid + "/get/request/database/model"
-	Publish_guid_get          = uid + "/get/request/database/guid"
 	Publish_register_get      = uid + "/get/request/database/register"
 	Publish_realtime_data_get = uid + "/get/request/database/realtime"
 	Publish_history_data_get  = uid + "/get/request/database/history"
 	Publish_alarm_data_get    = uid + "/get/request/database/SOE"
-	Publish_get_MonMax        = uid + "/set/request/database/DataStoreDepth"
-	Publish_initData          = uid + "/action/request/database/InitData"
 	Publish_getParams         = uid + "/get/request/TestApp/params"
 	Publish_setParams         = uid + "/set/request/TestApp/params"
 
@@ -31,16 +25,6 @@ const (
 	Received_alarm_data_get    = "database/get/response/" + uid + "/SOE"
 	Received_getParams         = "TestApp/get/response/" + uid + "/params"
 	Received_setParams         = "TestApp/set/response/" + uid + "/params"
-
-	Message                = "{\n  \"token\": \"123\", \n  \"timestamp\": \"2019-03-01T09:30:08.230+0800\",\n  \"body\": []\n}"
-	Realtime_message       = "{ \"token\":\"123\",\"timestamp\":\"2022-03-21T09:30:08.230+0800\",\"body\":[{\"dev\":\"LTU_bb38620dc4e710b0\", \"totalcall\":\"0\", \"body\":[\"Tmp\"]}]}"
-	History_period_message = "{\n\"token\":\"123\",\n\"time_type\":\"timestartgather\",\n\"start_time\":\"2022-03-23T16:00:00.727+0800\",\n\"end_time\":\"2023-03-23T17:00:30.727+0800\",\n\"time_span\":\"5\",\n\"frozentype\":\"min\",\n\"body\":{\n\"dev\":\"LTU_bb38620dc4e710b0\",\n\"body\":[\"PhV_phsB\"]\n}\n}\n"
-	History_lastN_message  = "{\"token\": \"123\", 	\"timestamp\": \"2022-03-01T09:30:08.230+0800\", 	\"dev\": \"LTU_bb38620dc4e710b0\", 	\"frozentype\": \"min\", 	\"upperN\": \"10\", 	\"body\": [] }"
-	// 数据区初始化
-	Init_message = "{\"token\":\"123\",\"timestamp\":\"2019-03-01T09:30:08.230+0800\",\"model\":\"LTU\",\"Action\":\"frozenData\",\"data\":\"All\"}"
-	// 告警消息
-	Alarm_message     = "{\"token\": \"123\",\"time_type\":\"timestartgather\",\"start_time\": \"2020-02-24T14:08:34.055+0800\",\"end_time\": \"2020-02-24T16:38:34.055+0800\",\"SourType\": \"104\", \"body\": [{\"model\": \"MultiMeter_frozen\",\"totaldev\": \"0\",\"dev\":[\"MultiMeter_frozen_7fb2132a153c212b\"]}]}"
-	GetConfig_message = "{\"dev\":\"123456\"}"
 )
 
 var ModelConfig = map[string]struct {

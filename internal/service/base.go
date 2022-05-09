@@ -40,7 +40,7 @@ func (s *sBase) BaseDeviceList(ctx context.Context, in model.BaseDeviceListIn) (
 		Timestamp: "",
 		Body:      []string{},
 	})
-	publish(consts.Publish_register_get, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(ctx, "pub_topics.Publish_register_get").String(), string(msg))
 	topo := model.MqttDatabaseGetTopoOut{}
 	select {
 	case topo = <-topoChan:
@@ -89,7 +89,7 @@ func (s *sBase) BaseRealtime(ctx context.Context, in model.BaseRealtimeIn) (out 
 			},
 		},
 	})
-	publish(consts.Publish_realtime_data_get, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_realtime_data_get").String(), string(msg))
 	realtime := model.MqttDatabaseGetRealtimeOut{}
 	select {
 	case realtime = <-realtimeChan:
@@ -147,7 +147,7 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 		},
 	})
 	fmt.Println(string(msg))
-	publish(consts.Publish_history_data_get, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(msg))
 	history := model.MqttDatabaseGetHistoryOut{}
 	select {
 	case history = <-historyChan:
@@ -198,7 +198,7 @@ func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.
 		},
 	})
 	fmt.Println(string(msg))
-	publish(consts.Publish_alarm_data_get, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)
 	select {
@@ -266,7 +266,7 @@ func (s *sBase) BaseGetConfig(ctx context.Context, in model.BaseGetConfigIn) (ou
 		Dev: in.Dev,
 	})
 	fmt.Println(string(msg))
-	publish(consts.Publish_getParams, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_getParams").String(), string(msg))
 	getConfigData := model.MqttDataBaseGetConfigOut{}
 	fmt.Println(getConfigData)
 	select {
@@ -318,7 +318,7 @@ func (s *sBase) BaseSetConfig(ctx context.Context, in model.BaseSetConfigIn) (ou
 		},
 	})
 	fmt.Println(string(msg))
-	publish(consts.Publish_setParams, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_setParams").String(), string(msg))
 	setConfigData := model.MqttDataBaseSetConfigOut{}
 	select {
 	case setConfigData = <-setConfigChan:
@@ -351,7 +351,7 @@ func (s *sBase) BaseDayAnalysis(ctx context.Context, in model.BaseDayAnaIn) (out
 	})
 
 	fmt.Println(string(msg))
-	publish(consts.Publish_alarm_data_get, string(msg))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)
 	select {

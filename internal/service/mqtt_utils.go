@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"ttu-backend/internal/consts"
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 var mqttClient MQTT.Client
 
 func init() {
 	var b bool
-	b, mqttClient = connMQTT(consts.MQTTLAN)
+	b, mqttClient = connMQTT(g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTLAN").String())
 	if !b {
 		fmt.Println("pub connMQTT failed")
 		return
@@ -105,23 +105,17 @@ func connMQTT(broker string) (bool, MQTT.Client) {
 		return false, mc
 	}
 
-	mc.Subscribe(consts.Received_history_data_get, consts.MQTTQos, hisCallBackFunc)
-	mc.Subscribe(consts.Received_guid_get, consts.MQTTQos, guidCallBackFunc)
-	mc.Subscribe(consts.Received_device_get, consts.MQTTQos, deviceCallBackFunc)
-	mc.Subscribe(consts.Received_realtime_data_get, consts.MQTTQos, realtimeCallBackFunc)
-	mc.Subscribe(consts.Received_register_get, consts.MQTTQos, registerCallBackFunc)
-	mc.Subscribe(consts.Received_modelschema_get, consts.MQTTQos, schemaCallBackFunc)
-	mc.Subscribe(consts.Received_model_get, consts.MQTTQos, modelCallBackFunc)
-	mc.Subscribe(consts.Received_initData, consts.MQTTQos, initCallBackFunc)
-	mc.Subscribe(consts.Received_alarm_data_get, consts.MQTTQos, alarmCallBackFunc)
-	mc.Subscribe(consts.Received_setParams, consts.MQTTQos, setParamsCallBackFunc)
-	mc.Subscribe(consts.Received_getParams, consts.MQTTQos, getParamsCallBackFunc)
-	mc.Subscribe(consts.Received_history_data_get, consts.MQTTQos, hisCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_history_data_get").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], hisCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_realtime_data_get").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], realtimeCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_register_get").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], registerCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_alarm_data_get").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], alarmCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_setParams").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], setParamsCallBackFunc)
+	mc.Subscribe(g.Cfg("mqtt_config").MustGet(nil, "sub_topics.Received_getParams").String(), g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], getParamsCallBackFunc)
 	return true, mc
 }
 
 // 发布消息
 func publish(topic string, str string) {
 	// 发送
-	mqttClient.Publish(topic, consts.MQTTQos, true, str)
+	mqttClient.Publish(topic, g.Cfg("mqtt_config").MustGet(nil, "mqtt.MQTTQos").Bytes()[0], true, str)
 }
