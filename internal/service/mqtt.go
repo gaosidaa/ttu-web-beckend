@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gogf/gf/v2/frame/g"
 	"ttu-backend/internal/consts"
 	"ttu-backend/internal/model"
 	"ttu-backend/internal/model/entity"
@@ -73,7 +74,7 @@ func (s *sMqtt) MqttDatabaseGetHistory(ctx context.Context, in model.MqttDatabas
 		return out, err
 	}
 	fmt.Println(string(reqJson))
-	publish(consts.Publish_history_data_get, string(reqJson))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(reqJson))
 
 	out = <-historyChan
 	return out, nil
@@ -105,7 +106,7 @@ func (s *sMqtt) MqttDatabaseGetHistoryN(ctx context.Context, in model.MqttDataba
 		return out, err
 	}
 	fmt.Println(string(reqJson))
-	publish(consts.Publish_history_data_get, string(reqJson))
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(reqJson))
 
 	out = <-historyChan
 	return out, nil
@@ -117,7 +118,7 @@ func (s *sMqtt) MqttDatabaseGetRealtime(ctx context.Context, in string) (out mod
 	}
 	// 发布消息
 	fmt.Println("发布的消息 " + in)
-	publish(consts.Publish_realtime_data_get, in)
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_realtime_data_get").String(), in)
 	out = <-realtimeChan
 	return out, nil
 }
@@ -128,7 +129,7 @@ func (s *sMqtt) MqttDatabaseGetTopo(ctx context.Context, in string, modelName []
 	}
 	// 发布消息
 	fmt.Println("发布的消息 " + in)
-	publish(consts.Publish_register_get, in)
+	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_register_get").String(), in)
 	// 对消息体进行解析
 	return TopoHandler(<-topoChan, modelName), nil
 }
