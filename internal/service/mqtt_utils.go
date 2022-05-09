@@ -95,9 +95,15 @@ func initCallBackFunc(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Subscribe: Topic is [%s]; msg is [%s]\n", msg.Topic(), string(msg.Payload()))
 }
 
+var connectLostHandler MQTT.ConnectionLostHandler = func(client MQTT.Client, err error) {
+	fmt.Printf("Connection lost: %v \n", err)
+	client.Connect()
+}
+
 // 连接MQTT服务
 func connMQTT(broker string) (bool, MQTT.Client) {
 	opts := MQTT.NewClientOptions()
+	opts.OnConnectionLost = connectLostHandler
 	opts.AddBroker(broker)
 
 	mc := MQTT.NewClient(opts)
