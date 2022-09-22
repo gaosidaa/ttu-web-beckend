@@ -40,7 +40,7 @@ func (s *sBase) BaseDeviceList(ctx context.Context, in model.BaseDeviceListIn) (
 		Timestamp: "",
 		Body:      []string{},
 	})
-	publish(g.Cfg("mqtt_config").MustGet(ctx, "pub_topics.Publish_register_get").String(), string(msg))
+	publish(g.Cfg().MustGet(ctx, "pub_topics.Publish_register_get").String(), string(msg))
 	topo := model.MqttDatabaseGetTopoOut{}
 	select {
 	case topo = <-topoChan:
@@ -89,7 +89,7 @@ func (s *sBase) BaseRealtime(ctx context.Context, in model.BaseRealtimeIn) (out 
 			},
 		},
 	})
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_realtime_data_get").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_realtime_data_get").String(), string(msg))
 	realtime := model.MqttDatabaseGetRealtimeOut{}
 	select {
 	case realtime = <-realtimeChan:
@@ -147,7 +147,7 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 		},
 	})
 	fmt.Println(string(msg))
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(msg))
 	history := model.MqttDatabaseGetHistoryOut{}
 	select {
 	case history = <-historyChan:
@@ -198,7 +198,7 @@ func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.
 		},
 	})
 	fmt.Println(string(msg))
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)
 	select {
@@ -216,6 +216,7 @@ func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.
 		alarm.AlarmType = bb.Event //consts.AlarmDict[bb.Event]
 		alarm.Remark = "分->合"
 		alarm.Status = "已读"
+		//fmt.Println(bb.Extdata)
 		out.Alarm = append(out.Alarm, alarm)
 	}
 	//fmt.Println(alarmChan)
@@ -266,7 +267,7 @@ func (s *sBase) BaseGetConfig(ctx context.Context, in model.BaseGetConfigIn) (ou
 		Dev: in.Dev,
 	})
 	fmt.Println(string(msg))
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_getParams").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_getParams").String(), string(msg))
 	getConfigData := model.MqttDataBaseGetConfigOut{}
 	fmt.Println(getConfigData)
 	select {
@@ -280,10 +281,11 @@ func (s *sBase) BaseGetConfig(ctx context.Context, in model.BaseGetConfigIn) (ou
 	}
 	if len(getConfigData.Body) > 4 {
 		out.LeakageProtectionStatus = getConfigData.Body[0].Val
-		out.RatedProtectionCurrentThreshold, _ = strconv.Atoi(getConfigData.Body[1].Val)
-		out.ThresholdProtectionActionTime, _ = strconv.Atoi(getConfigData.Body[2].Val)
 		out.RatedLeakageProtectionDifference, _ = strconv.Atoi(getConfigData.Body[3].Val)
 		out.InterpolationProtectionActionTime, _ = strconv.Atoi(getConfigData.Body[4].Val)
+		out.ThresholdProtectionActionTime, _ = strconv.Atoi(getConfigData.Body[2].Val)
+		out.RatedProtectionCurrentThreshold, _ = strconv.Atoi(getConfigData.Body[1].Val)
+
 	}
 
 	fmt.Println(getConfigData)
@@ -296,29 +298,29 @@ func (s *sBase) BaseSetConfig(ctx context.Context, in model.BaseSetConfigIn) (ou
 		Dev: in.Dev,
 		Body: []model.MqttDatabaseSetConfigInBody{
 			{
-				Name: "1",
+				Name: "leakage_protection_status",
 				Val:  in.LeakageProtectionStatus,
 			},
 			{
-				Name: "2",
-				Val:  strconv.Itoa(in.InterpolationProtectionActionTime),
-			},
-			{
-				Name: "3",
-				Val:  strconv.Itoa(in.RatedLeakageProtectionDifference),
-			},
-			{
-				Name: "4",
+				Name: "rated_protection_current_threshold",
 				Val:  strconv.Itoa(in.RatedProtectionCurrentThreshold),
 			},
 			{
-				Name: "5",
+				Name: "threshold_protection_action_time",
 				Val:  strconv.Itoa(in.ThresholdProtectionActionTime),
+			},
+			{
+				Name: "rated_leakage_protection_difference",
+				Val:  strconv.Itoa(in.RatedLeakageProtectionDifference),
+			},
+			{
+				Name: "interpolation_protection_action_time",
+				Val:  strconv.Itoa(in.InterpolationProtectionActionTime),
 			},
 		},
 	})
 	fmt.Println(string(msg))
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_setParams").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_setParams").String(), string(msg))
 	setConfigData := model.MqttDataBaseSetConfigOut{}
 	select {
 	case setConfigData = <-setConfigChan:
@@ -351,7 +353,7 @@ func (s *sBase) BaseDayAnalysis(ctx context.Context, in model.BaseDayAnaIn) (out
 	})
 
 	fmt.Println(string(msg))
-	publish(g.Cfg("mqtt_config").MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
+	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)
 	select {
