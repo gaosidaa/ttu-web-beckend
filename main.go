@@ -2,11 +2,10 @@ package main
 
 import (
 	_ "ttu-backend/internal/packed"
-
-	"github.com/gogf/gf/v2/os/gctx"
-	"ttu-backend/internal/cmd"
+	"ttu-backend/logRecorder"
 )
 
 func main() {
-	cmd.Main.Run(gctx.New())
+	//cmd.Main.Run(gctx.New())
+	logRecorder.PrintmynameTest()
 }
