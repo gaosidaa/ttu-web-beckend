@@ -8,4 +8,5 @@ import (
 func main() {
 	//cmd.Main.Run(gctx.New())
 	logRecorder.PrintmynameTest()
+	logRecorder.Log_test()
 }
