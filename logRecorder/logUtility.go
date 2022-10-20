@@ -16,13 +16,19 @@ func TestFunc() {
 }
 
 func Log_test() {
+	print("\n\n\nstart log test \n")
 	fmt.Println("Hello, world!")
 	log.Println("log test")
 
-	log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
-	log.Println("这是一条很普通的日志。")
+	//log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
+	log.SetFlags(log.Llongfile | log.Ltime | log.Ldate)
+	var s1 string
+	s1 = "output sample"
+	log.Println(s1)
 	//time.Sleep(3 * time.Second)
 	log.Println("log test")
+	CheckFile(s1)
+	CreateFile()
 }
 
 func Foo() {

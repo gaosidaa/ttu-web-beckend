@@ -4,17 +4,28 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
-func checkFile(Filename string) bool {
+func CheckFile(Filename string) bool {
 	var exist = true
+	timeString := time.Now().Format("2006-01-02")
+	file := "./logRecorder/LogData/" + timeString + ".log"
+	Filename = file
 	if _, err := os.Stat(Filename); os.IsNotExist(err) {
 		exist = false
 		if err != nil {
-			fmt.Println("检查文件失败")
+			fmt.Println("Check file error!")
 		}
 	}
 	return exist
+}
+
+func CreateFile() bool {
+	timeString := time.Now().Format("2006-01-02")
+	file := "./logRecorder/LogData/" + timeString + ".log"
+	println(file)
+	return true
 }
 
 //写入文件
@@ -24,7 +35,7 @@ func Logfile(Log string) {
 
 	Filenames := "./launch.log" //也可将name作为参数传进来
 
-	if checkFile(Filenames) { //如果文件存在
+	if CheckFile(Filenames) { //如果文件存在
 		f1, err1 = os.OpenFile(Filenames, os.O_APPEND|os.O_WRONLY, 0666) //打开文件,第二个参数是写入方式和权限
 		if err1 != nil {
 			fmt.Println("文件存在，已打开")
