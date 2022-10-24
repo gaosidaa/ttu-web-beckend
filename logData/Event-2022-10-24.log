@@ -1,0 +1,11 @@
+mylooger_2022/10/24 10:08:39 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:33: 使用Output进行日志输出
+Event2022/10/24 10:14:35 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:33: 使用Output进行日志输出
+Event2022/10/24 10:17:58 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:33: 使用Output进行日志输出
+Event2022/10/24 10:17:58 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:35: output test
+Event2022/10/24 10:51:28 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:33: 使用Output进行日志输出
+Event2022/10/24 10:51:28 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:35: output test
+Event2022/10/24 13:59:10 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:34: 使用Output进行日志输出
+Event2022/10/24 14:06:27 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:34: 使用Output进行日志输出
+Event2022/10/24 14:08:36 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:34: 使用Output进行日志输出
+Event2022/10/24 14:09:10 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:34: 使用Output进行日志输出
+Event2022/10/24 14:09:10 C:/Users/gaosida/GoProjects/电力公司/block1/ttu-web-beckend/logRecorder/logUtility.go:68: {"ID":"user001","Name":"tom"}

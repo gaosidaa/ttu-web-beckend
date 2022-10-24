@@ -1,18 +1,17 @@
 package logRecorder
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
 )
 
+var systemlogger, eventlogger *log.Logger
+
 func PrintmynameTest() string {
 	pc, _, _, _ := runtime.Caller(1)
 	return runtime.FuncForPC(pc).Name()
-}
-
-func TestFunc() {
-	println("test func")
 }
 
 func Log_test() {
@@ -29,8 +28,16 @@ func Log_test() {
 	log.Println("log test")
 	CheckFile(s1)
 	CreateFile()
+	println("-------------------------")
+
+	systemlogger = InitLog("System")
+	eventlogger = InitLog("Event")
+	println(PrintmynameTest())
+	//LogOutput(eventlogger, "output test")
+	jsonTest()
 }
 
+/*
 func Foo() {
 	fmt.Printf("我是 %s, %s 在调用我!\n", printMyName(), printCallerName())
 	Bar()
@@ -45,4 +52,18 @@ func printMyName() string {
 func printCallerName() string {
 	pc, _, _, _ := runtime.Caller(2)
 	return runtime.FuncForPC(pc).Name()
+}
+*/
+
+type User struct {
+	ID   string
+	Name string
+}
+
+func jsonTest() {
+	u := User{ID: "user001", Name: "tom"}
+	jsonU, _ := json.Marshal(u)
+	fmt.Printf("jsonU: %T\n", jsonU)
+	fmt.Println(string(jsonU))
+	LogOutputJson(eventlogger, jsonU)
 }

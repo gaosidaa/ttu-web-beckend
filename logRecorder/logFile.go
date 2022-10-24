@@ -3,6 +3,7 @@ package logRecorder
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"time"
 )
@@ -53,4 +54,47 @@ func Logfile(Log string) {
 	//fmt.Printf("写入 %d 个字节\n", n)
 
 	return
+}
+
+/*--------------------------------------*/
+/*-----------new version----------------*/
+
+func InitLog(name string) *log.Logger {
+	//创建文件对象, 日志的格式为当前时间2006-01-02 15:04:05.log;据说是golang的诞生时间，固定写法
+	timeString := time.Now().Format("2006-01-02")
+	//file := "./" + timeString + ".log"
+	file := "./logData/" + name + "-" + timeString + ".log"
+
+	logFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
+	if err != nil {
+		panic(err)
+	}
+
+	//创建一个Logger, 参数1：日志写入的文件, 参数2：每条日志的前缀；参数3：日志属性
+	logpointer := log.New(logFile, "logpre_", log.Lshortfile)
+
+	//Prefix返回前缀，Flags返回Logger的输出选项属性值
+	fmt.Printf("\n\n创建时前缀为:%s\n创建时输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
+
+	//SetFlags 重新设置输出选项
+	logpointer.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
+
+	//重新设置输出前缀
+	logpointer.SetPrefix(name)
+
+	//获取修改后的前缀和输出项属性值
+	fmt.Printf("修改后前缀为:%s\n修改后输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
+
+	logpointer.Output(2, "使用Output进行日志输出")
+
+	return logpointer
+	//return log.New(logFile, "logpre_", log.Lshortfile)
+}
+
+func LogOutput(logpointer *log.Logger, content string) {
+	logpointer.Output(2, content)
+}
+
+func LogOutputJson(logpointer *log.Logger, content []uint8) {
+	logpointer.Output(2, string(content))
 }
