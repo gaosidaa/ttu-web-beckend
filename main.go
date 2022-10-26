@@ -1,12 +1,14 @@
 package main
 
 import (
+	"github.com/gogf/gf/v2/os/gctx"
+	"ttu-backend/internal/cmd"
 	_ "ttu-backend/internal/packed"
-	"ttu-backend/logRecorder"
 )
 
 func main() {
-	//cmd.Main.Run(gctx.New())
-	println(logRecorder.PrintmynameTest())
-	logRecorder.Log_test()
+	cmd.Main.Run(gctx.New())
+	//println(logRecorder.PrintmynameTest())
+	//logRecorder.Log_test()
+
 }

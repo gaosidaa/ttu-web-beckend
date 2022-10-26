@@ -13,6 +13,7 @@ import (
 	"time"
 	"ttu-backend/internal/consts"
 	"ttu-backend/internal/model"
+	"ttu-backend/logRecorder"
 )
 
 type (
@@ -30,6 +31,9 @@ func Base() *sBase {
 	return &insBase
 }
 
+var systemLog logRecorder.SystemLog = logRecorder.SystemLog{logRecorder.InitLog("System")}
+var eventLog logRecorder.EventLog = logRecorder.EventLog{logRecorder.InitLog("Event")}
+
 func (s *sBase) BaseDeviceList(ctx context.Context, in model.BaseDeviceListIn) (out model.BaseDeviceListOut, err error) {
 	if err != nil {
 		return out, err
@@ -46,6 +50,7 @@ func (s *sBase) BaseDeviceList(ctx context.Context, in model.BaseDeviceListIn) (
 	case topo = <-topoChan:
 	case <-time.After(3 * time.Second):
 		err = fmt.Errorf("读取超时")
+		eventLog.Writelog(" 读取超时")
 		return
 	}
 	modelName := []string{"LTU", "Switch"}
@@ -75,9 +80,12 @@ func (s *sBase) BaseDeviceList(ctx context.Context, in model.BaseDeviceListIn) (
 		}
 	}
 	_ = TopoHandler(topo, modelName)
+
+	eventLog.Writelog(" 读取成功" + out.Station)
 	return
 }
 func (s *sBase) BaseRealtime(ctx context.Context, in model.BaseRealtimeIn) (out model.BaseRealtimeOut, err error) {
+	//eventLog.Writelog("Dev: " + in.Dev)
 	msg, _ := json.Marshal(model.MqttDatabaseGetRealtimeIn{
 		Token:     "1000",
 		Timestamp: "",
@@ -90,15 +98,18 @@ func (s *sBase) BaseRealtime(ctx context.Context, in model.BaseRealtimeIn) (out 
 		},
 	})
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_realtime_data_get").String(), string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
 	realtime := model.MqttDatabaseGetRealtimeOut{}
 	select {
 	case realtime = <-realtimeChan:
 	case <-time.After(3 * time.Second):
 		err = fmt.Errorf("读取超时")
+		systemLog.Writelog("读取超时")
 		return
 	}
 	if len(realtime.Body) == 0 || realtime.Body[0].Dev != in.Dev {
 		err = fmt.Errorf("获取失败")
+		systemLog.Writelog("获取失败")
 		return
 	}
 	paras := g.Map{}
@@ -127,6 +138,7 @@ func (s *sBase) BaseRealtime(ctx context.Context, in model.BaseRealtimeIn) (out 
 			record,
 		},
 	}
+	eventLog.Writelog(" 读取成功")
 	return out, nil
 }
 func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out model.BaseRecordOut, err error) {
@@ -147,16 +159,20 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 		},
 	})
 	fmt.Println(string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
+
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_history_data_get").String(), string(msg))
 	history := model.MqttDatabaseGetHistoryOut{}
 	select {
 	case history = <-historyChan:
 	case <-time.After(3 * time.Second):
 		err = fmt.Errorf("读取超时")
+		eventLog.Writelog(" 读取超时")
 		return
 	}
 	if history.Body.Dev != frozenDev {
 		err = fmt.Errorf("获取失败")
+		eventLog.Writelog(" 获取失败")
 		return
 	}
 
@@ -180,7 +196,9 @@ func (s *sBase) BaseRecord(ctx context.Context, in model.BaseRecordIn) (out mode
 	return out, nil
 }
 func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.BaseAlarmOut, err error) {
-	//fmt.Println(in)
+	//eventLog.Writelog("Start time: " + in.StartTime)
+	//eventLog.Writelog("End time: " + in.EndTime)
+	//eventLog.Writelog("Dev: " + in.Dev)
 	msg, _ := json.Marshal(model.MqttDataBaseGetAlarmIn{
 		Token:     "1000",
 		Time_type: "timestartgather",
@@ -198,6 +216,7 @@ func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.
 		},
 	})
 	fmt.Println(string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)
@@ -205,6 +224,7 @@ func (s *sBase) BaseAlarm(ctx context.Context, in model.BaseAlarmIn) (out model.
 	case alarmData = <-alarmChan:
 	case <-time.After(3 * time.Second):
 		err = fmt.Errorf("读取超时")
+		eventLog.Writelog(" 读取超时")
 		return
 	}
 	out = model.BaseAlarmOut{
@@ -267,6 +287,7 @@ func (s *sBase) BaseGetConfig(ctx context.Context, in model.BaseGetConfigIn) (ou
 		Dev: in.Dev,
 	})
 	fmt.Println(string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_getParams").String(), string(msg))
 	getConfigData := model.MqttDataBaseGetConfigOut{}
 	fmt.Println(getConfigData)
@@ -320,6 +341,7 @@ func (s *sBase) BaseSetConfig(ctx context.Context, in model.BaseSetConfigIn) (ou
 		},
 	})
 	fmt.Println(string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_setParams").String(), string(msg))
 	setConfigData := model.MqttDataBaseSetConfigOut{}
 	select {
@@ -353,6 +375,7 @@ func (s *sBase) BaseDayAnalysis(ctx context.Context, in model.BaseDayAnaIn) (out
 	})
 
 	fmt.Println(string(msg))
+	eventLog.Writelog("Alarm message: " + string(msg))
 	publish(g.Cfg().MustGet(nil, "pub_topics.Publish_alarm_data_get").String(), string(msg))
 	alarmData := model.MqttDataBaseGetAlarmOut{}
 	//fmt.Println(alarm_data)

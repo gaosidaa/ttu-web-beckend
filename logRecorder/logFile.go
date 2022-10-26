@@ -1,8 +1,6 @@
 package logRecorder
 
 import (
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"time"
@@ -11,17 +9,19 @@ import (
 func CheckFile(Filename string) bool {
 	var exist = true
 	timeString := time.Now().Format("2006-01-02")
-	file := "./logRecorder/LogData/" + timeString + ".log"
+	//file := "./logData/" + timeString + ".log"
+	file := "./logData/" + Filename + "-" + timeString + ".log"
 	Filename = file
 	if _, err := os.Stat(Filename); os.IsNotExist(err) {
 		exist = false
 		if err != nil {
-			fmt.Println("Check file error!")
+			//fmt.Println("Check file error!")
 		}
 	}
 	return exist
 }
 
+/*
 func CreateFile() bool {
 	timeString := time.Now().Format("2006-01-02")
 	file := "./logRecorder/LogData/" + timeString + ".log"
@@ -29,7 +29,10 @@ func CreateFile() bool {
 	return true
 }
 
+*/
+
 //写入文件
+/*
 func Logfile(Log string) {
 	var f1 *os.File
 	var err1 error
@@ -56,6 +59,8 @@ func Logfile(Log string) {
 	return
 }
 
+*/
+
 /*--------------------------------------*/
 /*-----------new version----------------*/
 
@@ -74,27 +79,52 @@ func InitLog(name string) *log.Logger {
 	logpointer := log.New(logFile, "logpre_", log.Lshortfile)
 
 	//Prefix返回前缀，Flags返回Logger的输出选项属性值
-	fmt.Printf("\n\n创建时前缀为:%s\n创建时输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
+	//fmt.Printf("\n\n创建时前缀为:%s\n创建时输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
 
 	//SetFlags 重新设置输出选项
 	logpointer.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
+	logpointer.SetFlags(log.Ldate | log.Ltime)
 
 	//重新设置输出前缀
 	logpointer.SetPrefix(name)
 
 	//获取修改后的前缀和输出项属性值
-	fmt.Printf("修改后前缀为:%s\n修改后输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
+	//fmt.Printf("修改后前缀为:%s\n修改后输出项属性值为:%d\n", logpointer.Prefix(), logpointer.Flags())
 
-	logpointer.Output(2, "使用Output进行日志输出")
+	logpointer.Output(2, "打开日志")
 
 	return logpointer
 	//return log.New(logFile, "logpre_", log.Lshortfile)
 }
 
-func LogOutput(logpointer *log.Logger, content string) {
+func logOutput(logpointer *log.Logger, content string) {
 	logpointer.Output(2, content)
 }
 
-func LogOutputJson(logpointer *log.Logger, content []uint8) {
+/*
+
+func logOutputJson(logpointer *log.Logger, content []uint8) {
 	logpointer.Output(2, string(content))
 }
+
+func outputlog(logpointer *log.Logger, content string, kind int) *log.Logger {
+	//kind : 1 System
+	//kind : 2 Event
+	var fileKind string
+	switch {
+	case kind == 1:
+		fileKind = "System"
+	case kind == 2:
+		fileKind = "Event"
+	default:
+		fileKind = "Event"
+	}
+	//println(CheckFile(fileKind))
+	if CheckFile(fileKind) == false {
+		logpointer = InitLog(fileKind)
+	}
+	logOutput(logpointer, content)
+	return logpointer
+}
+
+*/
